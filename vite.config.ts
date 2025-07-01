@@ -1,16 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  build: {
-    rollupOptions: {
-      external: [
-        'date-fns',
-        'date-fns/locale/ar-SA',
-        'lucide-react'
-      ]
+  resolve: {
+    alias: {
+      '@firebase': path.resolve(__dirname, './src/0-firebase')
     }
   },
   optimizeDeps: {
@@ -18,7 +14,14 @@ export default defineConfig({
       'date-fns/format',
       'date-fns/locale/ar-SA',
       'lucide-react'
-    ],
-    exclude: ['lucide-react'] // Keep this if you specifically need to exclude it
+    ]
+  },
+  build: {
+    rollupOptions: {
+      external: [
+        'date-fns',
+        'date-fns/locale/ar-SA'
+      ]
+    }
   }
 });
