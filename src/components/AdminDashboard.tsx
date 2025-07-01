@@ -38,7 +38,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-const formatDate = (date: Date) => {
+  const formatDate = (date: Date) => {
     try {
       return format(date, 'yyyy/MM/dd HH:mm', { locale: arSA });
     } catch (error) {
@@ -46,17 +46,20 @@ const formatDate = (date: Date) => {
       return date.toLocaleDateString('ar-SA');
     }
   };
+
   useEffect(() => {
     const q = query(collection(db, 'applications'), orderBy('submissionDate', 'desc'));
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const apps: Application[] = [];
       querySnapshot.forEach((doc) => {
+        const data = doc.data();
         apps.push({ 
           id: doc.id, 
-          ...doc.data(),
-          // Convert Firestore Timestamp to Date if needed
-          submissionDate: doc.data().submissionDate?.toDate() 
+          ...data,
+          // Force status to 'pending' if not set
+          status: data.status || 'pending',
+          submissionDate: data.submissionDate?.toDate() 
         } as Application);
       });
       setApplications(apps);
@@ -66,23 +69,19 @@ const formatDate = (date: Date) => {
     return () => unsubscribe();
   }, []);
 
-  // Apply filters
   useEffect(() => {
     let result = applications;
     
-    // Apply status filter
     if (filter !== 'all') {
       result = result.filter(app => app.status === filter);
     }
     
-    // Apply registration type filter
     if (registrationTypeFilter !== 'all') {
       result = result.filter(app => 
-        app.registrationType.toLowerCase() === registrationTypeFilter
+        app.registrationType?.toLowerCase() === registrationTypeFilter
       );
     }
     
-    // Apply search
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(app => 
@@ -137,7 +136,7 @@ const formatDate = (date: Date) => {
       app.email,
       app.course,
       app.registrationType === 'Basic' ? 'أولي' : 'كامل',
-      app.status === 'pending' ? 'قيد الانتظار' : 
+      app.status === 'pending' ? 'قيد المراجعة' : 
         app.status === 'approved' ? 'مقبول' : 'مرفوض',
       format(app.submissionDate, 'yyyy-MM-dd HH:mm', { locale: arSA })
     ].join(','));
@@ -387,14 +386,17 @@ const formatDate = (date: Date) => {
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        app.status === 'pending'
+                        !app.status || app.status === 'pending'
                           ? 'bg-yellow-100 text-yellow-800'
                           : app.status === 'approved'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                       }`}>
-                        {app.status === 'pending' ? 'قيد المراجعة' : 
-                         app.status === 'approved' ? 'مقبول' : 'مرفوض'}
+                        {!app.status || app.status === 'pending' 
+                          ? 'قيد المراجعة' 
+                          : app.status === 'approved' 
+                            ? 'مقبول' 
+                            : 'مرفوض'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-800">
@@ -552,14 +554,17 @@ const formatDate = (date: Date) => {
                     <p className="text-sm text-gray-500">حالة الطلب</p>
                     <p className="font-medium">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        selectedApplication.status === 'pending'
+                        !selectedApplication.status || selectedApplication.status === 'pending'
                           ? 'bg-yellow-100 text-yellow-800'
                           : selectedApplication.status === 'approved'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                       }`}>
-                        {selectedApplication.status === 'pending' ? 'قيد المراجعة' : 
-                         selectedApplication.status === 'approved' ? 'مقبول' : 'مرفوض'}
+                        {!selectedApplication.status || selectedApplication.status === 'pending' 
+                          ? 'قيد المراجعة' 
+                          : selectedApplication.status === 'approved' 
+                            ? 'مقبول' 
+                            : 'مرفوض'}
                       </span>
                     </p>
                   </div>
