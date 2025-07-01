@@ -124,33 +124,47 @@ const AdminDashboard = () => {
     }
   };
 
-  const exportToCSV = () => {
-    const headers = [
-      'الاسم الكامل', 'الهاتف', 'البريد الإلكتروني', 'الدورة', 
-      'نوع التسجيل', 'الحالة', 'تاريخ التسجيل'
-    ].join(',');
-    
-    const rows = filteredApplications.map(app => [
-      app.fullName,
-      app.phone,
-      app.email,
-      app.course,
-      app.registrationType === 'Basic' ? 'أولي' : 'كامل',
-      app.status === 'pending' ? 'قيد المراجعة' : 
-        app.status === 'approved' ? 'مقبول' : 'مرفوض',
-      format(app.submissionDate, 'yyyy-MM-dd HH:mm', { locale: arSA })
-    ].join(','));
-    
-    const csvContent = [headers, ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `طلبات_التسجيل_${format(new Date(), 'yyyy-MM-dd')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+ const exportToCSV = () => {
+  // CSV headers (Arabic text)
+  const headers = [
+    'الاسم الكامل', 
+    'الهاتف', 
+    'البريد الإلكتروني', 
+    'الدورة', 
+    'نوع التسجيل', 
+    'الحالة', 
+    'تاريخ التسجيل'
+  ].join(',');
+
+  // CSV rows
+  const rows = filteredApplications.map(app => [
+    `"${app.fullName || ''}"`,       // Wrap in quotes to handle commas
+    `"${app.phone || ''}"`,         // Wrap in quotes
+    `"${app.email || ''}"`,         // Wrap in quotes
+    `"${app.course || ''}"`,        // Wrap in quotes
+    app.registrationType === 'Basic' ? 'أولي' : 'كامل',
+    app.status === 'pending' ? 'قيد المراجعة' : 
+      app.status === 'approved' ? 'مقبول' : 'مرفوض',
+    `"${format(app.submissionDate, 'yyyy-MM-dd HH:mm', { locale: arSA })}"` // Wrap in quotes
+  ].join(','));
+
+  // Combine headers and rows
+  const csvContent = [headers, ...rows].join('\n');
+
+  // Fix encoding for Arabic characters
+  const blob = new Blob(["\uFEFF" + csvContent], { 
+    type: 'text/csv;charset=utf-8;' 
+  });
+
+  // Create download link
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `طلبات_التسجيل_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
   const stats = {
     total: applications.length,
