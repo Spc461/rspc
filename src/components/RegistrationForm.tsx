@@ -128,7 +128,7 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
           </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-4">Rising Academy</h1>
           <p className="text-gray-600 text-lg">
-            {type === 'full' ? 'تسجيل كامل مع دفع مسبق' : 'تسجيل أولي مجاني'}
+            {type === 'full' ? 'تسجيل كامل عن بعد' : 'تسجيل أولي مجاني'}
           </p>
         </div>
       </div>
