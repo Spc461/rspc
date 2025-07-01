@@ -2,16 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-
 const firebaseConfig = {
-  // Replace with your actual Firebase config
-  apiKey: 'AIzaSyCvksPmWtLz4X6w5tWD2AyE2In1y2VP_y4',
-  authDomain: 'risingacademy-fd918.firebaseapp.com',
-  projectId: 'risingacademy-fd918',
-  storageBucket: 'risingacademy-fd918.firebasestorage.app',
-  messagingSenderId: '543287545062',
-  appId: '1:543287545062:web:a7193e38005c283428bf27',
-  measurementId: 'G-46TN14568Z',
+  apiKey: "AIzaSyAb51b0FPjEv2UocApwDeb8K9zAHg_TNWg",
+  authDomain: "risinga-ebc76.firebaseapp.com",
+  projectId: "risinga-ebc76",
+  storageBucket: "risinga-ebc76.firebasestorage.app",
+  messagingSenderId: "386879187827",
+  appId: "1:386879187827:web:44b37ee62346cde6913306",
+  measurementId: "G-2KJYKCSYEB"
 };
 
 // Initialize Firebase
