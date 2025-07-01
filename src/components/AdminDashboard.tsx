@@ -18,17 +18,16 @@ import {
   collection, 
   query, 
   orderBy, 
-  onSnapshot, 
-  where,
+  onSnapshot,
   updateDoc,
   doc,
   deleteDoc
 } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import { db, auth } from '../firebase/config';
-import { Application } from '../types';
-import { format } from 'date-fns';
-import { arSA } from 'date-fns/locale';
+import { db, auth } from '../../firebase/config';
+import { Application } from '../../types';
+import format from 'date-fns/format';
+import arSA from 'date-fns/locale/ar-SA';
 
 const AdminDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
