@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { db, auth } from '../../0-firebase-config';  // Adjust path as needed
+import { auth, db } from './0-firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from './firebase/config';
+
 import FloatingElements from './components/FloatingElements';
 import ChoicePage from './components/ChoicePage';
 import RegistrationForm from './components/RegistrationForm';
