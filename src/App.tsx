@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { db, auth } from './firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './firebase/config';
 import FloatingElements from './components/FloatingElements';
