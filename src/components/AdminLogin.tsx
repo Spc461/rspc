@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { db, auth } from '../../0-firebase-config';  // Adjust path as needed
 
 interface AdminLoginProps {
   onBack: () => void;
