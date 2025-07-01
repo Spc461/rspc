@@ -44,6 +44,7 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.5 }}
       className="min-h-screen flex items-center justify-center p-4"
+      dir="rtl"
     >
       <div className="max-w-md w-full">
         {/* Back Button */}
@@ -58,11 +59,11 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
         </motion.button>
 
         {/* Login Card */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-8 shadow-2xl relative overflow-hidden">
           {/* Animated background elements */}
           <div className="absolute inset-0">
             <motion.div
-              className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#22b0fc]/20 to-transparent rounded-full"
+              className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#22b0fc]/10 to-transparent rounded-full"
               animate={{
                 scale: [1, 1.2, 1],
                 rotate: [0, 180, 360],
@@ -74,7 +75,7 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
               }}
             />
             <motion.div
-              className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-500/20 to-transparent rounded-full"
+              className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full"
               animate={{
                 scale: [1, 1.3, 1],
                 rotate: [360, 180, 0],
@@ -99,8 +100,8 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
               <div className="w-20 h-20 bg-gradient-to-r from-[#22b0fc] to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
                 <Shield className="w-10 h-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-white mb-2">لوحة التحكم</h1>
-              <p className="text-blue-200">دخول المدير</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">لوحة التحكم</h1>
+              <p className="text-gray-600">دخول المدير</p>
             </motion.div>
 
             {/* Form */}
@@ -110,7 +111,7 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                <label className="block text-white font-semibold mb-2 text-right">
+                <label className="block text-gray-800 font-semibold mb-2 text-right">
                   البريد الإلكتروني
                 </label>
                 <input
@@ -118,7 +119,7 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] transition-all duration-300"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
                   placeholder="admin@risingacademy.com"
                   dir="ltr"
                 />
@@ -129,7 +130,7 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                <label className="block text-white font-semibold mb-2 text-right">
+                <label className="block text-gray-800 font-semibold mb-2 text-right">
                   كلمة المرور
                 </label>
                 <div className="relative">
@@ -138,14 +139,14 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] transition-all duration-300 pr-12"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300 pr-12"
                     placeholder="••••••••"
                     dir="ltr"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -156,7 +157,7 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-xl text-center"
+                  className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-xl text-center"
                 >
                   {error}
                 </motion.div>
@@ -192,7 +193,7 @@ const AdminLogin = ({ onBack, onLoginSuccess }: AdminLoginProps) => {
                 <span className="relative z-10">
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white ml-3"></div>
                       جاري تسجيل الدخول...
                     </div>
                   ) : (

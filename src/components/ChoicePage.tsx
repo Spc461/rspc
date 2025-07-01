@@ -12,6 +12,7 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="min-h-screen flex items-center justify-center p-4"
+      dir="rtl"
     >
       <div className="max-w-4xl w-full">
         {/* Logo and Header */}
@@ -28,10 +29,10 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
             </div>
           </div>
           
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-[#22b0fc] to-blue-800 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl font-bold text-white mb-4">
             اختر نوع التسجيل
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
             اختر طريقة التسجيل التي تناسبك في أكاديمية رايزين للتسجيل والاستشارات
           </p>
         </motion.div>
@@ -46,27 +47,27 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
             className="group cursor-pointer"
             onClick={() => onChoiceSelect('basic')}
           >
-            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl hover:shadow-[#22b0fc]/25 transition-all duration-500 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#22b0fc]/10 to-cyan-500/10 group-hover:from-[#22b0fc]/20 group-hover:to-cyan-500/20 transition-all duration-500"></div>
+            <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-[#22b0fc]/25 transition-all duration-500 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#22b0fc]/5 to-cyan-500/5 group-hover:from-[#22b0fc]/10 group-hover:to-cyan-500/10 transition-all duration-500"></div>
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-gradient-to-r from-[#22b0fc] to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <GraduationCap className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-4">تسجيل أولي</h3>
-                <p className="text-blue-100 text-lg mb-6">
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">تسجيل أولي</h3>
+                <p className="text-gray-600 text-lg mb-6">
                 تسجيل كمرحلة اولى يحتاج منك التوجه الى المركز بعد التواصل
                 </p>
-                <ul className="space-y-2 text-blue-100">
+                <ul className="space-y-2 text-gray-700">
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-[#22b0fc] rounded-full mr-3"></div>
+                    <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
                     حجز مكانك في الدورة
                   </li>
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-[#22b0fc] rounded-full mr-3"></div>
+                    <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
                     معلومات تفصيلية عن المنهج
                   </li>
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-[#22b0fc] rounded-full mr-3"></div>
+                    <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
                     إمكانية التواصل المباشر
                   </li>
                 </ul>
@@ -82,27 +83,27 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
             className="group cursor-pointer"
             onClick={() => onChoiceSelect('full')}
           >
-            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl hover:shadow-green-500/25 transition-all duration-500 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 group-hover:from-green-500/20 group-hover:to-emerald-500/20 transition-all duration-500"></div>
+            <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-green-500/25 transition-all duration-500 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 group-hover:from-green-500/10 group-hover:to-emerald-500/10 transition-all duration-500"></div>
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <CreditCard className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-4">تسجيل كلي</h3>
-                <p className="text-green-100 text-lg mb-6">
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">تسجيل كلي</h3>
+                <p className="text-gray-600 text-lg mb-6">
                   تسجيل كامل مع دفع اما مرة واحدة او جزئيا وضمان مكانك في الدورة
                 </p>
-                <ul className="space-y-2 text-green-100">
+                <ul className="space-y-2 text-gray-700">
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></div>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
                     ضمان مكانك بنسبة 100%
                   </li>
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></div>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
                     امكانية التسجيل عن بعد بدون الحاجة الى التوجه لمركز الاكاديمية
                   </li>
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></div>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
                     متابعة مستمرة بعد الدورة
                   </li>
                 </ul>
@@ -124,7 +125,7 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
             onClick={() => onChoiceSelect('admin')}
             className="bg-gradient-to-r from-[#22b0fc] to-blue-600 hover:from-[#1a9de8] hover:to-blue-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-[#22b0fc]/25 transition-all duration-300 flex items-center mx-auto"
           >
-            <Shield className="w-6 h-6 mr-3" />
+            <Shield className="w-6 h-6 ml-3" />
             الدخول للإدارة
           </motion.button>
         </motion.div>

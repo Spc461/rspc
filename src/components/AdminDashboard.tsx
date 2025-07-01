@@ -61,7 +61,7 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" dir="rtl">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>جاري تحميل البيانات...</p>
@@ -75,13 +75,14 @@ const AdminDashboard = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="min-h-screen p-6"
+      dir="rtl"
     >
       {/* Header */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 mb-6 border border-white/20">
+      <div className="bg-white rounded-3xl p-6 mb-6 shadow-2xl">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">لوحة التحكم</h1>
-            <p className="text-blue-200">إدارة طلبات التسجيل</p>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">لوحة التحكم</h1>
+            <p className="text-gray-600">إدارة طلبات التسجيل</p>
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -108,19 +109,19 @@ const AdminDashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={`bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center`}
+            className={`bg-white rounded-2xl p-6 shadow-xl text-center`}
           >
             <div className={`w-12 h-12 bg-${stat.color}-500 rounded-xl flex items-center justify-center mx-auto mb-4`}>
               <stat.icon className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">{stat.value}</h3>
-            <p className="text-gray-300">{stat.title}</p>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">{stat.value}</h3>
+            <p className="text-gray-600">{stat.title}</p>
           </motion.div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 mb-6 border border-white/20">
+      <div className="bg-white rounded-2xl p-4 mb-6 shadow-xl">
         <div className="flex space-x-4">
           {[
             { key: 'all', label: 'الكل', color: '[#22b0fc]' },
@@ -135,10 +136,10 @@ const AdminDashboard = () => {
               className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                 filter === filterOption.key
                   ? `bg-${filterOption.color}-500 text-white shadow-lg`
-                  : 'bg-white/10 text-white hover:bg-white/20'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <Filter className="w-4 h-4 inline mr-2" />
+              <Filter className="w-4 h-4 inline ml-2" />
               {filterOption.label}
             </motion.button>
           ))}
@@ -146,17 +147,17 @@ const AdminDashboard = () => {
       </div>
 
       {/* Applications Table */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-white/5">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-right text-white font-semibold">الاسم</th>
-                <th className="px-6 py-4 text-right text-white font-semibold">الهاتف</th>
-                <th className="px-6 py-4 text-right text-white font-semibold">الدورة</th>
-                <th className="px-6 py-4 text-right text-white font-semibold">النوع</th>
-                <th className="px-6 py-4 text-right text-white font-semibold">التاريخ</th>
-                <th className="px-6 py-4 text-right text-white font-semibold">الإجراءات</th>
+                <th className="px-6 py-4 text-right text-gray-800 font-semibold">الاسم</th>
+                <th className="px-6 py-4 text-right text-gray-800 font-semibold">الهاتف</th>
+                <th className="px-6 py-4 text-right text-gray-800 font-semibold">الدورة</th>
+                <th className="px-6 py-4 text-right text-gray-800 font-semibold">النوع</th>
+                <th className="px-6 py-4 text-right text-gray-800 font-semibold">التاريخ</th>
+                <th className="px-6 py-4 text-right text-gray-800 font-semibold">الإجراءات</th>
               </tr>
             </thead>
             <tbody>
@@ -166,21 +167,21 @@ const AdminDashboard = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="border-b border-white/10 hover:bg-white/5 transition-colors"
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                 >
-                  <td className="px-6 py-4 text-white">{app.fullName}</td>
-                  <td className="px-6 py-4 text-white" dir="ltr">{app.phone}</td>
-                  <td className="px-6 py-4 text-white">{app.course}</td>
+                  <td className="px-6 py-4 text-gray-800">{app.fullName}</td>
+                  <td className="px-6 py-4 text-gray-800" dir="ltr">{app.phone}</td>
+                  <td className="px-6 py-4 text-gray-800">{app.course}</td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                       app.registrationType === 'Basic'
-                        ? 'bg-[#22b0fc]/20 text-blue-200'
-                        : 'bg-green-500/20 text-green-200'
+                        ? 'bg-[#22b0fc]/20 text-blue-700'
+                        : 'bg-green-500/20 text-green-700'
                     }`}>
                       {app.registrationType === 'Basic' ? 'أولي' : 'كامل'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-white">
+                  <td className="px-6 py-4 text-gray-800">
                     {new Date(app.submissionDate).toLocaleDateString('ar-EG')}
                   </td>
                   <td className="px-6 py-4">
@@ -200,7 +201,7 @@ const AdminDashboard = () => {
         </div>
 
         {filteredApplications.length === 0 && (
-          <div className="text-center py-12 text-white">
+          <div className="text-center py-12 text-gray-600">
             <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg">لا توجد طلبات مسجلة</p>
           </div>
@@ -218,55 +219,55 @@ const AdminDashboard = () => {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-white/20"
+            className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white">تفاصيل التسجيل</h2>
+              <h2 className="text-2xl font-bold text-gray-800">تفاصيل التسجيل</h2>
               <button
                 onClick={() => setSelectedApplication(null)}
-                className="text-white hover:text-gray-300 text-2xl"
+                className="text-gray-500 hover:text-gray-700 text-2xl"
               >
                 ×
               </button>
             </div>
 
-            <div className="space-y-4 text-white">
+            <div className="space-y-4 text-gray-800">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">الاسم الكامل</label>
+                  <label className="block text-sm font-semibold text-gray-600">الاسم الكامل</label>
                   <p className="text-lg">{selectedApplication.fullName}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">العمر</label>
+                  <label className="block text-sm font-semibold text-gray-600">العمر</label>
                   <p className="text-lg">{selectedApplication.age}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">رقم الهاتف</label>
+                  <label className="block text-sm font-semibold text-gray-600">رقم الهاتف</label>
                   <p className="text-lg" dir="ltr">{selectedApplication.phone}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">البريد الإلكتروني</label>
+                  <label className="block text-sm font-semibold text-gray-600">البريد الإلكتروني</label>
                   <p className="text-lg">{selectedApplication.email || 'غير متوفر'}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">الولاية</label>
+                  <label className="block text-sm font-semibold text-gray-600">الولاية</label>
                   <p className="text-lg">{selectedApplication.wilaya}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">المستوى التعليمي</label>
+                  <label className="block text-sm font-semibold text-gray-600">المستوى التعليمي</label>
                   <p className="text-lg">{selectedApplication.education}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">الدورة</label>
+                  <label className="block text-sm font-semibold text-gray-600">الدورة</label>
                   <p className="text-lg">{selectedApplication.course}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">نوع التسجيل</label>
+                  <label className="block text-sm font-semibold text-gray-600">نوع التسجيل</label>
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     selectedApplication.registrationType === 'Basic'
-                      ? 'bg-[#22b0fc]/20 text-blue-200'
-                      : 'bg-green-500/20 text-green-200'
+                      ? 'bg-[#22b0fc]/20 text-blue-700'
+                      : 'bg-green-500/20 text-green-700'
                   }`}>
                     {selectedApplication.registrationType === 'Basic' ? 'أولي' : 'كامل'}
                   </span>
@@ -275,60 +276,60 @@ const AdminDashboard = () => {
 
               {selectedApplication.experience && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">الخبرة السابقة</label>
+                  <label className="block text-sm font-semibold text-gray-600">الخبرة السابقة</label>
                   <p className="text-lg">{selectedApplication.experience}</p>
                 </div>
               )}
 
               {selectedApplication.comments && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300">ملاحظات</label>
+                  <label className="block text-sm font-semibold text-gray-600">ملاحظات</label>
                   <p className="text-lg">{selectedApplication.comments}</p>
                 </div>
               )}
 
               {selectedApplication.registrationType === 'Full' && (
-                <div className="space-y-4 border-t border-white/20 pt-4">
+                <div className="space-y-4 border-t border-gray-200 pt-4">
                   <h3 className="text-xl font-bold">معلومات الدفع</h3>
                   {selectedApplication.paymentMethod && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300">طريقة الدفع</label>
+                      <label className="block text-sm font-semibold text-gray-600">طريقة الدفع</label>
                       <p className="text-lg">{selectedApplication.paymentMethod}</p>
                     </div>
                   )}
                   
                   {selectedApplication.paymentProofUrl && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">إثبات الدفع</label>
+                      <label className="block text-sm font-semibold text-gray-600 mb-2">إثبات الدفع</label>
                       <img 
                         src={selectedApplication.paymentProofUrl} 
                         alt="Payment Proof" 
-                        className="max-w-full h-auto rounded-lg border border-white/20"
+                        className="max-w-full h-auto rounded-lg border border-gray-200"
                       />
                     </div>
                   )}
 
                   {(selectedApplication.idFrontUrl || selectedApplication.idBackUrl) && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">صور الهوية</label>
+                      <label className="block text-sm font-semibold text-gray-600 mb-2">صور الهوية</label>
                       <div className="grid md:grid-cols-2 gap-4">
                         {selectedApplication.idFrontUrl && (
                           <div>
-                            <p className="text-sm text-gray-400 mb-2">الوجه الأمامي</p>
+                            <p className="text-sm text-gray-500 mb-2">الوجه الأمامي</p>
                             <img 
                               src={selectedApplication.idFrontUrl} 
                               alt="ID Front" 
-                              className="max-w-full h-auto rounded-lg border border-white/20"
+                              className="max-w-full h-auto rounded-lg border border-gray-200"
                             />
                           </div>
                         )}
                         {selectedApplication.idBackUrl && (
                           <div>
-                            <p className="text-sm text-gray-400 mb-2">الوجه الخلفي</p>
+                            <p className="text-sm text-gray-500 mb-2">الوجه الخلفي</p>
                             <img 
                               src={selectedApplication.idBackUrl} 
                               alt="ID Back" 
-                              className="max-w-full h-auto rounded-lg border border-white/20"
+                              className="max-w-full h-auto rounded-lg border border-gray-200"
                             />
                           </div>
                         )}
@@ -338,11 +339,11 @@ const AdminDashboard = () => {
 
                   {selectedApplication.signature && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">التوقيع</label>
+                      <label className="block text-sm font-semibold text-gray-600 mb-2">التوقيع</label>
                       <img 
                         src={selectedApplication.signature} 
                         alt="Signature" 
-                        className="max-w-full h-auto rounded-lg border border-white/20 bg-white"
+                        className="max-w-full h-auto rounded-lg border border-gray-200 bg-white"
                       />
                     </div>
                   )}
