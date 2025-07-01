@@ -4,17 +4,12 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: [
-      'firebase',
-      'firebase/auth',
-      'firebase/firestore',
-      'firebase/analytics',
-      'firebase/storage'
-    ]
+    exclude: ['firebase', 'firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/analytics'],
+    include: ['react', 'react-dom']
   },
   build: {
-    rollupOptions: {
-      external: [] // Keep this empty
+    commonjsOptions: {
+      include: [/node_modules/]
     }
   }
 });
