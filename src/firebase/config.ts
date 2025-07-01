@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+
 const firebaseConfig = {
   apiKey: "AIzaSyAb51b0FPjEv2UocApwDeb8K9zAHg_TNWg",
   authDomain: "risinga-ebc76.firebaseapp.com",
@@ -11,6 +12,7 @@ const firebaseConfig = {
   appId: "1:386879187827:web:44b37ee62346cde6913306",
   measurementId: "G-2KJYKCSYEB"
 };
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
