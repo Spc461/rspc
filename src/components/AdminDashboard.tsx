@@ -38,7 +38,14 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch applications
+const formatDate = (date: Date) => {
+    try {
+      return format(date, 'yyyy/MM/dd HH:mm', { locale: arSA });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return date.toLocaleDateString('ar-SA');
+    }
+  };
   useEffect(() => {
     const q = query(collection(db, 'applications'), orderBy('submissionDate', 'desc'));
     
