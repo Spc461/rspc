@@ -5,7 +5,7 @@ import SignatureCanvas from 'react-signature-canvas';
 import { COURSES, WILAYAS, EDUCATION_LEVELS, PAYMENT_METHODS } from '../data/constants';
 import { Application } from '../types';
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db, auth } from '../../0-firebase-config';  // Adjust path as needed
 
 interface RegistrationFormProps {
   type: 'basic' | 'full';
