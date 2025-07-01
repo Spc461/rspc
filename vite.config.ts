@@ -1,27 +1,23 @@
+// vite.config.ts
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@firebase': path.resolve(__dirname, './src/0-firebase')
-    }
-  },
   optimizeDeps: {
     include: [
+      'firebase/app',
+      'firebase/auth',
+      'firebase/firestore',
       'date-fns/format',
       'date-fns/locale/ar-SA',
       'lucide-react'
-    ]
+    ],
+    exclude: [] // Remove all excludes
   },
   build: {
     rollupOptions: {
-      external: [
-        'date-fns',
-        'date-fns/locale/ar-SA'
-      ]
+      external: [] // Remove all externals
     }
   }
 });
