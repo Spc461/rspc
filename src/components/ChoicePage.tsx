@@ -100,7 +100,7 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
                   </li>
                   <li className="flex items-center">
                     <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
-                    امكانية التسجيل عن بعد بدون الحاجة الى التوجه للاكاديمية
+                    امكانية التسجيل عن بعد كليا
                   </li>
                   <li className="flex items-center">
                     <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
