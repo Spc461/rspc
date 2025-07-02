@@ -1,20 +1,30 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, CreditCard, Shield } from 'lucide-react';
+import { GraduationCap, CreditCard, Shield, Calendar } from 'lucide-react';
+import WorkshopSection from './WorkshopSection';
+import WorkshopRegistrationModal from './WorkshopRegistrationModal';
+import { Workshop } from '../types';
 
 interface ChoicePageProps {
   onChoiceSelect: (type: 'basic' | 'full' | 'admin') => void;
 }
 
 const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
+  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
+
+  const handleWorkshopRegister = (workshop: Workshop) => {
+    setSelectedWorkshop(workshop);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex flex-col items-center justify-center p-4"
       dir="rtl"
     >
-      <div className="max-w-4xl w-full">
+      <div className="max-w-6xl w-full">
         {/* Logo and Header */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -25,7 +35,17 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
           <div className="w-32 h-32 mx-auto mb-8 relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-[#22b0fc] rounded-full animate-pulse"></div>
             <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
-              <GraduationCap className="w-16 h-16 text-[#22b0fc]" />
+              <img 
+                src="/mainlogo.png" 
+                alt="Rising Academy Logo" 
+                className="w-16 h-16 object-contain"
+                onError={(e) => {
+                  // Fallback to graduation cap if logo fails to load
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <GraduationCap className="w-16 h-16 text-[#22b0fc] hidden" />
             </div>
           </div>
           
@@ -112,11 +132,28 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
           </motion.div>
         </div>
 
-        {/* Admin Button */}
+        {/* Workshops Section */}
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.6 }}
+          className="mb-12"
+        >
+          <div className="bg-white rounded-3xl p-8 shadow-2xl">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                <Calendar className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <WorkshopSection onRegister={handleWorkshopRegister} />
+          </div>
+        </motion.div>
+
+        {/* Admin Button */}
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 1.1, duration: 0.6 }}
           className="text-center"
         >
           <motion.button
@@ -130,6 +167,14 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
           </motion.button>
         </motion.div>
       </div>
+
+      {/* Workshop Registration Modal */}
+      {selectedWorkshop && (
+        <WorkshopRegistrationModal
+          workshop={selectedWorkshop}
+          onClose={() => setSelectedWorkshop(null)}
+        />
+      )}
     </motion.div>
   );
 };

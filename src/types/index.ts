@@ -17,6 +17,7 @@ export interface Application {
   paymentProofUrl?: string;
   idFrontUrl?: string;
   idBackUrl?: string;
+  status?: 'pending' | 'approved' | 'rejected';
 }
 
 export interface CourseOption {
@@ -29,4 +30,28 @@ export interface CourseOption {
 export interface WilayaOption {
   code: string;
   name: string;
+}
+
+export interface Workshop {
+  id?: string;
+  name: string;
+  arabicName: string;
+  description: string;
+  imageUrl: string;
+  date: Date;
+  duration: string;
+  maxParticipants: number;
+  currentParticipants: number;
+  isActive: boolean;
+  createdAt: Date;
+}
+
+export interface WorkshopRegistration {
+  id?: string;
+  workshopId: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  registrationDate: Date;
+  status: 'registered' | 'attended' | 'cancelled';
 }

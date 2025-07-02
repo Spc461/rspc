@@ -1,11 +1,12 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Upload, Check, X } from 'lucide-react';
+import { ArrowLeft, Upload, Check, X, GraduationCap } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
-import { COURSES, WILAYAS, EDUCATION_LEVELS, PAYMENT_METHODS } from '../data/constants';
+import { COURSES, WILAYAS, EDUCATION_LEVELS, PAYMENT_METHODS, CONTRACT_TEXT } from '../data/constants';
 import { Application } from '../types';
 import { collection, addDoc } from 'firebase/firestore';
 import { auth, db } from '../0-firebase/config';
+
 interface RegistrationFormProps {
   type: 'basic' | 'full';
   onBack: () => void;
@@ -19,6 +20,7 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+  const [showContract, setShowContract] = useState(false);
   const [files, setFiles] = useState<{
     idFront?: File;
     idBack?: File;
@@ -122,9 +124,17 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-[#22b0fc]/10"></div>
         <div className="relative z-10 text-center">
           <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-[#22b0fc] rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
-            <div className="text-3xl font-bold text-white">
-              RA
-            </div>
+            <img 
+              src="/mainlogo.png" 
+              alt="Rising Academy Logo" 
+              className="w-12 h-12 object-contain"
+              onError={(e) => {
+                // Fallback to graduation cap if logo fails to load
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <GraduationCap className="w-12 h-12 text-white hidden" />
           </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-4">Rising Academy</h1>
           <p className="text-gray-600 text-lg">
@@ -192,11 +202,10 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
             </div>
             <div>
               <label className="block text-gray-800 font-semibold mb-2">
-                البريد الإلكتروني {type === 'full' && <span className="text-red-500">*</span>} <span className="text-sm text-gray-500">Email</span>
+                البريد الإلكتروني (اختياري) <span className="text-sm text-gray-500">Email</span>
               </label>
               <input
                 type="email"
-                required={type === 'full'}
                 className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
                 placeholder="example@email.com"
                 onChange={(e) => handleInputChange('email', e.target.value)}
@@ -283,7 +292,7 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-purple-600 mb-3">دورات اللغات - Language Courses</h3>
+                <h3 className="text-lg font-semibold text-yellow-600 mb-3">دورات اللغات - Language Courses</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {languageCourses.map((course) => (
                     <motion.div
@@ -304,8 +313,8 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
                         htmlFor={course.id}
                         className={`block p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 text-center ${
                           selectedCourse === course.name
-                            ? 'bg-purple-500 border-purple-400 text-white shadow-lg'
-                            : 'bg-gray-50 border-gray-200 text-gray-800 hover:bg-gray-100'
+                            ? 'bg-yellow-500 border-yellow-400 text-white shadow-lg'
+                            : 'bg-gray-50 border-gray-200 text-gray-800 hover:bg-yellow-50'
                         }`}
                       >
                         <div className="font-semibold">{course.name}</div>
@@ -470,7 +479,15 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
                     onChange={(e) => handleInputChange('agreedToContract', e.target.checked)}
                   />
                   <span className="text-gray-800 text-sm">
-                    أوافق على شروط وأحكام الأكاديمية وسياسة الاسترداد
+                    أوافق على 
+                    <button
+                      type="button"
+                      onClick={() => setShowContract(true)}
+                      className="text-[#22b0fc] hover:underline mx-1"
+                    >
+                      شروط وأحكام الأكاديمية
+                    </button>
+                    وسياسة الاسترداد
                     <span className="block text-gray-600 mt-1">
                       I agree to the academy's terms and conditions and refund policy
                     </span>
@@ -526,6 +543,46 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
           )}
         </form>
       </div>
+
+      {/* Contract Modal */}
+      {showContract && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowContract(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">شروط وأحكام التسجيل</h2>
+              <button
+                onClick={() => setShowContract(false)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+              <pre className="whitespace-pre-wrap font-sans">{CONTRACT_TEXT}</pre>
+            </div>
+            <div className="flex justify-end mt-6">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowContract(false)}
+                className="bg-[#22b0fc] hover:bg-[#1a9de8] text-white px-6 py-3 rounded-lg font-medium"
+              >
+                إغلاق
+              </motion.button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };
