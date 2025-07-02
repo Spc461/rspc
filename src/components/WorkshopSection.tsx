@@ -6,14 +6,10 @@ import {
   query, 
   where, 
   orderBy, 
-  onSnapshot,
-  addDoc,
-  updateDoc,
-  doc,
-  increment
+  onSnapshot
 } from 'firebase/firestore';
 import { db } from '../0-firebase/config';
-import { Workshop, WorkshopRegistration } from '../types';
+import { Workshop } from '../types';
 import format from 'date-fns/format';
 import arSA from 'date-fns/locale/ar-SA';
 
@@ -38,17 +34,25 @@ const WorkshopSection = ({ onRegister }: WorkshopSectionProps) => {
         const data = doc.data();
         const workshopDate = data.date?.toDate();
         
-        // Only show future workshops
-        if (workshopDate && workshopDate > new Date()) {
-          workshopsData.push({ 
-            id: doc.id, 
-            ...data,
-            date: workshopDate,
-            createdAt: data.createdAt?.toDate()
-          } as Workshop);
+        // Show all future workshops (including today)
+        if (workshopDate) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Reset time to start of day
+          
+          if (workshopDate >= today) {
+            workshopsData.push({ 
+              id: doc.id, 
+              ...data,
+              date: workshopDate,
+              createdAt: data.createdAt?.toDate()
+            } as Workshop);
+          }
         }
       });
       setWorkshops(workshopsData);
+      setLoading(false);
+    }, (error) => {
+      console.error('Error fetching workshops:', error);
       setLoading(false);
     });
 
@@ -59,6 +63,7 @@ const WorkshopSection = ({ onRegister }: WorkshopSectionProps) => {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22b0fc]"></div>
+        <p className="mr-4 text-gray-600">جاري تحميل الورش...</p>
       </div>
     );
   }
@@ -96,6 +101,10 @@ const WorkshopSection = ({ onRegister }: WorkshopSectionProps) => {
                 src={workshop.imageUrl}
                 alt={workshop.arabicName}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  // Fallback to a placeholder if image fails to load
+                  e.currentTarget.src = 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400';
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg">

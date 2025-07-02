@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Upload, Check, X, GraduationCap } from 'lucide-react';
+import { ArrowLeft, Upload, Check, X, GraduationCap, Info } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import { COURSES, WILAYAS, EDUCATION_LEVELS, PAYMENT_METHODS, CONTRACT_TEXT } from '../data/constants';
 import { Application } from '../types';
@@ -21,6 +21,7 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
   const [showContract, setShowContract] = useState(false);
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
   const [files, setFiles] = useState<{
     idFront?: File;
     idBack?: File;
@@ -54,6 +55,16 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
       reader.onload = () => resolve(reader.result as string);
       reader.onerror = error => reject(error);
     });
+  };
+
+  const handlePaymentMethodSelect = (method: string) => {
+    setSelectedPaymentMethod(method);
+    handleInputChange('paymentMethod', method);
+    setShowPaymentDetails(true);
+  };
+
+  const getSelectedPaymentMethodDetails = () => {
+    return PAYMENT_METHODS.find(method => method.name === selectedPaymentMethod);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,6 +106,7 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
         setFormData({ registrationType: type === 'full' ? 'Full' : 'Basic' });
         setSelectedCourse('');
         setSelectedPaymentMethod('');
+        setShowPaymentDetails(false);
         setFiles({});
         if (signatureRef.current) {
           signatureRef.current.clear();
@@ -202,7 +214,7 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
             </div>
             <div>
               <label className="block text-gray-800 font-semibold mb-2">
-                البريد الإلكتروني (اختياري) <span className="text-sm text-gray-500">Email</span>
+                البريد الإلكتروني (اختياري) <span className="text-sm text-gray-500">Email (Optional)</span>
               </label>
               <input
                 type="email"
@@ -410,10 +422,7 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
                         name="paymentMethod"
                         value={method.name}
                         checked={selectedPaymentMethod === method.name}
-                        onChange={(e) => {
-                          setSelectedPaymentMethod(e.target.value);
-                          handleInputChange('paymentMethod', e.target.value);
-                        }}
+                        onChange={(e) => handlePaymentMethodSelect(e.target.value)}
                         className="sr-only"
                         required
                       />
@@ -427,10 +436,32 @@ const RegistrationForm = ({ type, onBack }: RegistrationFormProps) => {
                       >
                         <div className="text-2xl mb-2">{method.icon}</div>
                         <div className="font-semibold">{method.name}</div>
+                        <div className="text-xs opacity-80 mt-1">{method.description}</div>
                       </label>
                     </motion.div>
                   ))}
                 </div>
+
+                {/* Payment Details */}
+                {showPaymentDetails && selectedPaymentMethod && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-blue-800 mb-2">
+                          تفاصيل الدفع - {getSelectedPaymentMethodDetails()?.name}
+                        </h4>
+                        <div className="text-sm text-blue-700 whitespace-pre-line">
+                          {getSelectedPaymentMethodDetails()?.details}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </div>
 
               {/* Payment Proof */}

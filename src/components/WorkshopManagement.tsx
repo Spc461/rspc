@@ -38,6 +38,7 @@ const WorkshopManagement = () => {
     description: '',
     imageUrl: '',
     date: '',
+    time: '',
     duration: '',
     maxParticipants: 20,
     isActive: true
@@ -68,17 +69,29 @@ const WorkshopManagement = () => {
     e.preventDefault();
     
     try {
+      // Combine date and time
+      const workshopDateTime = new Date(`${formData.date}T${formData.time || '10:00'}`);
+      
       const workshopData = {
-        ...formData,
-        date: new Date(formData.date),
-        currentParticipants: 0,
-        createdAt: new Date()
+        name: formData.name,
+        arabicName: formData.arabicName,
+        description: formData.description,
+        imageUrl: formData.imageUrl,
+        date: workshopDateTime,
+        duration: formData.duration,
+        maxParticipants: formData.maxParticipants,
+        isActive: formData.isActive,
+        currentParticipants: editingWorkshop?.currentParticipants || 0,
+        createdAt: editingWorkshop?.createdAt || new Date()
       };
 
       if (editingWorkshop) {
         await updateDoc(doc(db, 'workshops', editingWorkshop.id!), workshopData);
       } else {
-        await addDoc(collection(db, 'workshops'), workshopData);
+        await addDoc(collection(db, 'workshops'), {
+          ...workshopData,
+          createdAt: new Date()
+        });
       }
 
       resetForm();
@@ -95,6 +108,7 @@ const WorkshopManagement = () => {
       description: workshop.description,
       imageUrl: workshop.imageUrl,
       date: format(workshop.date, 'yyyy-MM-dd'),
+      time: format(workshop.date, 'HH:mm'),
       duration: workshop.duration,
       maxParticipants: workshop.maxParticipants,
       isActive: workshop.isActive
@@ -119,6 +133,7 @@ const WorkshopManagement = () => {
       description: '',
       imageUrl: '',
       date: '',
+      time: '',
       duration: '',
       maxParticipants: 20,
       isActive: true
@@ -235,7 +250,7 @@ const WorkshopManagement = () => {
                 />
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     تاريخ الورشة
@@ -245,6 +260,17 @@ const WorkshopManagement = () => {
                     required
                     value={formData.date}
                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    وقت الورشة
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent"
                   />
                 </div>
@@ -329,6 +355,9 @@ const WorkshopManagement = () => {
                 src={workshop.imageUrl}
                 alt={workshop.arabicName}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400';
+                }}
               />
               <div className="absolute top-3 right-3">
                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -352,7 +381,7 @@ const WorkshopManagement = () => {
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar size={16} className="ml-2" />
-                  {format(workshop.date, 'yyyy/MM/dd', { locale: arSA })}
+                  {format(workshop.date, 'yyyy/MM/dd HH:mm', { locale: arSA })}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Clock size={16} className="ml-2" />
