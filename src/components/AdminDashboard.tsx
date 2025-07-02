@@ -14,7 +14,8 @@ import {
   Edit,
   Printer,
   Settings,
-  FileText
+  FileText,
+  UserCheck
 } from 'lucide-react';
 import { 
   collection, 
@@ -31,6 +32,7 @@ import { Application } from '../types';
 import format from 'date-fns/format';
 import arSA from 'date-fns/locale/ar-SA';
 import WorkshopManagement from './WorkshopManagement';
+import WorkshopApplications from './WorkshopApplications';
 
 const AdminDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -40,7 +42,7 @@ const AdminDashboard = () => {
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'applications' | 'workshops'>('applications');
+  const [activeTab, setActiveTab] = useState<'applications' | 'workshops' | 'workshop-applications'>('applications');
 
   const formatDate = (date: Date) => {
     try {
@@ -264,11 +266,26 @@ const AdminDashboard = () => {
             <Settings size={18} />
             إدارة الورش
           </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('workshop-applications')}
+            className={`flex-1 py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'workshop-applications'
+                ? 'bg-[#22b0fc] text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <UserCheck size={18} />
+            تسجيلات الورش
+          </motion.button>
         </div>
       </div>
 
       {activeTab === 'workshops' ? (
         <WorkshopManagement />
+      ) : activeTab === 'workshop-applications' ? (
+        <WorkshopApplications />
       ) : (
         <>
           {/* Stats Cards */}

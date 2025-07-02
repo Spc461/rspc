@@ -4,6 +4,7 @@ import { X, Calendar, Clock, Users, Check } from 'lucide-react';
 import { addDoc, collection, updateDoc, doc, increment } from 'firebase/firestore';
 import { db } from '../0-firebase/config';
 import { Workshop, WorkshopRegistration } from '../types';
+import { LANGUAGE_LEVELS } from '../data/constants';
 import format from 'date-fns/format';
 import arSA from 'date-fns/locale/ar-SA';
 
@@ -15,8 +16,10 @@ interface WorkshopRegistrationModalProps {
 const WorkshopRegistrationModal = ({ workshop, onClose }: WorkshopRegistrationModalProps) => {
   const [formData, setFormData] = useState({
     fullName: '',
+    age: '',
     phone: '',
-    email: ''
+    email: '',
+    languageLevel: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
@@ -28,9 +31,12 @@ const WorkshopRegistrationModal = ({ workshop, onClose }: WorkshopRegistrationMo
     try {
       const registrationData: Omit<WorkshopRegistration, 'id'> = {
         workshopId: workshop.id!,
+        workshopName: workshop.arabicName,
         fullName: formData.fullName,
+        age: parseInt(formData.age),
         phone: formData.phone,
         email: formData.email,
+        languageLevel: formData.languageLevel,
         registrationDate: new Date(),
         status: 'registered'
       };
@@ -47,7 +53,7 @@ const WorkshopRegistrationModal = ({ workshop, onClose }: WorkshopRegistrationMo
       
       // Reset form and close modal after success
       setTimeout(() => {
-        setFormData({ fullName: '', phone: '', email: '' });
+        setFormData({ fullName: '', age: '', phone: '', email: '', languageLevel: '' });
         setSubmitStatus(null);
         onClose();
       }, 2000);
@@ -91,6 +97,9 @@ const WorkshopRegistrationModal = ({ workshop, onClose }: WorkshopRegistrationMo
               src={workshop.imageUrl}
               alt={workshop.arabicName}
               className="w-20 h-20 object-cover rounded-lg"
+              onError={(e) => {
+                e.currentTarget.src = 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400';
+              }}
             />
             <div className="flex-1">
               <h3 className="text-lg font-bold text-gray-800 mb-2">
@@ -99,7 +108,7 @@ const WorkshopRegistrationModal = ({ workshop, onClose }: WorkshopRegistrationMo
               <div className="space-y-1 text-sm text-gray-600">
                 <div className="flex items-center">
                   <Calendar size={16} className="ml-2" />
-                  {format(workshop.date, 'EEEE، dd MMMM yyyy', { locale: arSA })}
+                  {format(workshop.date, 'EEEE، dd MMMM yyyy - HH:mm', { locale: arSA })}
                 </div>
                 <div className="flex items-center">
                   <Clock size={16} className="ml-2" />
@@ -130,45 +139,84 @@ const WorkshopRegistrationModal = ({ workshop, onClose }: WorkshopRegistrationMo
           </motion.div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-gray-800 font-semibold mb-2">
-                الاسم الكامل <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.fullName}
-                onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
-                placeholder="أدخل اسمك الكامل"
-              />
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-800 font-semibold mb-2">
+                  الاسم الكامل <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.fullName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
+                  placeholder="أدخل اسمك الكامل"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-800 font-semibold mb-2">
+                  العمر <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="16"
+                  max="65"
+                  value={formData.age}
+                  onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
+                  placeholder="العمر"
+                />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-800 font-semibold mb-2">
+                  رقم الهاتف <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
+                  placeholder="0555 123 456"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-800 font-semibold mb-2">
+                  البريد الإلكتروني (اختياري)
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
+                  placeholder="example@email.com"
+                />
+              </div>
             </div>
 
             <div>
               <label className="block text-gray-800 font-semibold mb-2">
-                رقم الهاتف <span className="text-red-500">*</span>
+                مستوى اللغة <span className="text-red-500">*</span>
               </label>
-              <input
-                type="tel"
+              <select
                 required
-                value={formData.phone}
-                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
-                placeholder="0555 123 456"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-800 font-semibold mb-2">
-                البريد الإلكتروني (اختياري)
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
-                placeholder="example@email.com"
-              />
+                value={formData.languageLevel}
+                onChange={(e) => setFormData(prev => ({ ...prev, languageLevel: e.target.value }))}
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#22b0fc] focus:border-transparent transition-all duration-300"
+              >
+                <option value="">اختر مستوى اللغة</option>
+                {LANGUAGE_LEVELS.map((level) => (
+                  <option key={level.id} value={level.name}>
+                    {level.name} - {level.description}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {submitStatus === 'error' && (

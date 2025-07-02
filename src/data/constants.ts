@@ -1,4 +1,4 @@
-import { CourseOption, WilayaOption } from '../types';
+import { CourseOption, WilayaOption, LanguageLevel } from '../types';
 
 export const COURSES: CourseOption[] = [
   // Professional Courses
@@ -90,6 +90,17 @@ export const EDUCATION_LEVELS = [
   'صاحب مؤسسة',
   'عاطل عن العمل',
   'غير ذلك'
+];
+
+export const LANGUAGE_LEVELS: LanguageLevel[] = [
+  { id: 'a1', name: 'A1', description: 'مبتدئ - Beginner' },
+  { id: 'a2', name: 'A2', description: 'أساسي - Elementary' },
+  { id: 'b1', name: 'B1', description: 'متوسط - Intermediate' },
+  { id: 'b2', name: 'B2', description: 'متوسط عالي - Upper Intermediate' },
+  { id: 'c1', name: 'C1', description: 'متقدم - Advanced' },
+  { id: 'c2', name: 'C2', description: 'إتقان - Proficiency' },
+  { id: 'native', name: 'Native', description: 'لغة أم - Native Speaker' },
+  { id: 'none', name: 'None', description: 'لا أتحدث اللغة - No Knowledge' }
 ];
 
 export const PAYMENT_METHODS = [

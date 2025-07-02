@@ -49,9 +49,18 @@ export interface Workshop {
 export interface WorkshopRegistration {
   id?: string;
   workshopId: string;
+  workshopName: string;
   fullName: string;
+  age: number;
   phone: string;
   email?: string;
+  languageLevel: string;
   registrationDate: Date;
   status: 'registered' | 'attended' | 'cancelled';
+}
+
+export interface LanguageLevel {
+  id: string;
+  name: string;
+  description: string;
 }
