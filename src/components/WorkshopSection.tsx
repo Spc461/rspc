@@ -5,7 +5,6 @@ import {
   collection, 
   query, 
   where, 
-  orderBy, 
   onSnapshot
 } from 'firebase/firestore';
 import { db } from '../0-firebase/config';
@@ -22,10 +21,10 @@ const WorkshopSection = ({ onRegister }: WorkshopSectionProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Query only by isActive to avoid composite index requirement
     const q = query(
       collection(db, 'workshops'), 
-      where('isActive', '==', true),
-      orderBy('date', 'asc')
+      where('isActive', '==', true)
     );
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -49,6 +48,10 @@ const WorkshopSection = ({ onRegister }: WorkshopSectionProps) => {
           }
         }
       });
+      
+      // Sort by date on the client side
+      workshopsData.sort((a, b) => a.date.getTime() - b.date.getTime());
+      
       setWorkshops(workshopsData);
       setLoading(false);
     }, (error) => {
