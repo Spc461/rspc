@@ -12,6 +12,8 @@ import AdminDashboard from './components/AdminDashboard';
 import WorkshopSection from './components/WorkshopSection';
 import ClubSection from './components/ClubSection';
 import JobApplicationForm from './components/JobApplicationForm';
+import InternApplicationModal from './components/InternApplicationModal';
+
 
 type AppState = 
   | 'loading' 
