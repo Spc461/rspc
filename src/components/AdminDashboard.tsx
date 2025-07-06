@@ -340,7 +340,7 @@ const AdminDashboard = () => {
         <WorkshopManagement />
       ) : activeTab === 'intern-applications' ? (
         <InternApplications />
-      ) : (
+      
       ) : activeTab === 'workshop-applications' ? (
         <WorkshopApplications />
       ) : activeTab === 'clubs' ? (
