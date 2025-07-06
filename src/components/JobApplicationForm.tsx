@@ -435,7 +435,7 @@ const JobApplicationForm = ({ onBack }) => {
               {/* CV Upload */}
               <div>
                 <label className="block text-gray-800 font-semibold mb-2">
-                  السيرة الذاتية (CV) <span className="text-red-500">*</span>
+                  السيرة الذاتية (CV) <span className="text-red-500"></span>
                 </label>
                 <input
                   type="file"
