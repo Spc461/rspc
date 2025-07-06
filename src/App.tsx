@@ -55,7 +55,7 @@ function App() {
     };
   }, []); // Runs once on mount
 
-  const handleChoiceSelect = (type: 'courses' | 'workshops' | 'clubs' | 'jobs' | 'admin' | 'basic' | 'full') => {
+  const handleChoiceSelect = (type: 'internapplication' | 'courses' | 'workshops' | 'clubs' | 'jobs' | 'admin' | 'basic' | 'full') => {
     if (type === 'admin') {
       if (user) {
         setCurrentPage('admin-dashboard');
