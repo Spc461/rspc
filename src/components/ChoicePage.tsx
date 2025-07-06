@@ -1,4 +1,5 @@
 import { useState } from 'react';
+const [showInternModal, setShowInternModal] = useState(false);
 import { motion } from 'framer-motion';
 import { GraduationCap, CreditCard, Calendar, Users, Briefcase, Shield, ArrowLeft } from 'lucide-react';
 
