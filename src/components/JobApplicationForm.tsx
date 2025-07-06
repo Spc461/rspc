@@ -445,7 +445,7 @@ const JobApplicationForm = ({ onBack }) => {
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 file:ml-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-500 file:text-white"
                 />
                 <p className="text-sm text-gray-500 mt-1">
-للسيرة الداتية يرجى رفع ملف word او pdf بحجم صغير                </p>
+   </p>
               </div>
 
               {/* Signature */}
