@@ -316,6 +316,41 @@ const ChoicePage = ({ onChoiceSelect, onBack, showCourseTypes }: ChoicePageProps
             </div>
           </motion.div>
         </div>
+<motion.div
+  initial={{ y: 100, opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  transition={{ delay: 0.9, duration: 0.6 }}
+  whileHover={{ scale: 1.05, rotateY: 5 }}
+  className="group cursor-pointer"
+  onClick={() => setJobType('intern')}
+>
+  <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 relative overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 group-hover:from-purple-500/10 group-hover:to-fuchsia-500/10 transition-all duration-500"></div>
+    <div className="relative z-10">
+      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+        <Briefcase className="w-8 h-8 text-white" />
+      </div>
+      <h3 className="text-3xl font-bold text-gray-800 mb-4">متربص</h3>
+      <p className="text-gray-600 text-lg mb-6">
+        قدم للتربص واكتسب خبرة عملية معنا
+      </p>
+      <ul className="space-y-2 text-gray-700">
+        <li className="flex items-center">
+          <div className="w-2 h-2 bg-purple-500 rounded-full ml-3"></div>
+          فرصة للتعلم الميداني
+        </li>
+        <li className="flex items-center">
+          <div className="w-2 h-2 bg-purple-500 rounded-full ml-3"></div>
+          إشراف مباشر من خبراء
+        </li>
+        <li className="flex items-center">
+          <div className="w-2 h-2 bg-purple-500 rounded-full ml-3"></div>
+          شهادة تربص في نهاية الفترة
+        </li>
+      </ul>
+    </div>
+  </div>
+</motion.div>
 
         {/* Admin Button */}
         <motion.div
