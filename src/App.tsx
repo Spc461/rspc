@@ -183,10 +183,10 @@ function App() {
     exit={{ opacity: 0 }}
     transition={{ duration: 0.5 }}
   >
-    <JobApplicationForm onBack={handleBackToChoice} />
-   
+    <InternApplicationModal onBack={handleBackToChoice} />
   </motion.div>
 )}
+
 
 
           {currentPage === 'admin-login' && (
