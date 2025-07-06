@@ -294,7 +294,7 @@ const ChoicePage = ({ onChoiceSelect, onBack, showCourseTypes }: ChoicePageProps
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <Briefcase className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-gray-800 mb-4">التقديم على وظيفة</h3>
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">التقديم على وظdيفة</h3>
                 <p className="text-gray-600 text-lg mb-6">
                   انضم إلى فريق العمل كمدرس أو موظف إداري
                 </p>
