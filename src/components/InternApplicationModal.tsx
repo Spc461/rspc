@@ -78,7 +78,7 @@ const InternApplicationModal = ({ onBack }: InternApplicationModalProps) => {
             <div className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
               <UserPlus className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">طلب تدريب</h1>
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">طلب تـربص</h1>
             <p className="text-gray-600 text-lg">
               املأ النموذج التالي للتقديم على فرصة التدريب
             </p>
