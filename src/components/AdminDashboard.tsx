@@ -348,7 +348,7 @@ const AdminDashboard = () => {
         <JobApplications />
       ) : (
        ) : activeTab === 'intern-applications' ? (
-        <JobApplications />
+        <InternApplications />
       ) : (
         <>
           {/* Stats Cards */}
