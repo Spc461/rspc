@@ -339,7 +339,7 @@ const ChoicePage = ({ onChoiceSelect, onBack, showCourseTypes }: ChoicePageProps
   );
 };
 
-export default ChoicePage; thats my choice page , import { motion } from 'framer-motion';
+export default ChoicePage;  , import { motion } from 'framer-motion';
 import { GraduationCap } from 'lucide-react';
 
 const LoadingScreen = () => {
