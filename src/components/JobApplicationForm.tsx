@@ -382,7 +382,7 @@ const JobApplicationForm = ({ onBack }) => {
               {jobType === 'teacher' ? (
                 <div>
                   <label className="block text-gray-800 font-semibold mb-2">
-                    اللغة التي تريد تدريسها <span className="text-red-500">*</span>
+                    المادة التي تريد تدريسها <span className="text-red-500">*</span>
                   </label>
                   <select
                     required
@@ -390,7 +390,7 @@ const JobApplicationForm = ({ onBack }) => {
                     onChange={(e) => setFormData(prev => ({ ...prev, teachingLanguage: e.target.value }))}
                     className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
                   >
-                    <option value="">اختر اللغة</option>
+                    <option value="">اختر المادة</option>
                     {TEACHING_LANGUAGES.map((language, index) => (
                       <option key={index} value={language}>
                         {language}
