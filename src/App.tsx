@@ -175,6 +175,19 @@ function App() {
               <JobApplicationForm onBack={handleBackToChoice} />
             </motion.div>
           )}
+          {currentPage === 'internapplication' && (
+  <motion.div
+    key="internapplication"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    <JobApplicationForm onBack={handleBackToChoice} />
+    {/* لو عندك كومبوننت خاص للتربص غير JobApplicationForm، استبدله هنا */}
+  </motion.div>
+)}
+
 
           {currentPage === 'admin-login' && (
             <motion.div
