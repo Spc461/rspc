@@ -41,10 +41,14 @@ const JobApplicationForm = ({ onBack }) => {
     setIsSubmitting(true);
 
     try {
-     
-      if (!signatureRef.current || signatureRef.current.isEmpty()) throw new Error('Signature is required');
+      if (!signatureRef.current || signatureRef.current.isEmpty()) {
+        throw new Error('Signature is required');
+      }
 
-      const cvBase64 = await convertFileToBase64(cvFile);
+      let cvBase64 = null;
+      if (cvFile) {
+        cvBase64 = await convertFileToBase64(cvFile);
+      }
 
       const baseData = {
         jobType,
@@ -56,14 +60,13 @@ const JobApplicationForm = ({ onBack }) => {
         placeOfBirth: formData.placeOfBirth,
         address: formData.address,
         skills: formData.skills || null,
-        cvUrl: cvBase64,
+        cvUrl: cvBase64, // null if no file uploaded
         signature: signatureRef.current.toDataURL(),
         agreedToContract: formData.agreedToContract,
         applicationDate: new Date(),
         status: 'pending'
       };
 
-      // Add conditional fields without undefined
       if (jobType === 'teacher') {
         baseData.teachingLanguage = formData.teachingLanguage;
       }
