@@ -316,17 +316,20 @@ const AdminDashboard = () => {
           >
             <Briefcase size={16} />
             طلبات التوظيف
-          </motion.button>
-          <motion.button
-  whileHover={{ scale: 1.03 }}
-  whileTap={{ scale: 0.97 }}
+        <motion.button
+  whileHover={{ scale: 1.02 }}
+  whileTap={{ scale: 0.98 }}
   onClick={() => setActiveTab('intern-applications')}
-  className={`px-3 py-2 rounded-lg text-sm font-medium ${
-    activeTab === 'intern-applications' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'
+  className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
+    activeTab === 'intern-applications'
+      ? 'bg-[#22b0fc] text-white shadow-lg'
+      : 'text-gray-600 hover:bg-gray-100'
   }`}
 >
+  <User size={16} />
   طلبات التدريب
 </motion.button>
+
 
         </div>
       </div>
