@@ -338,6 +338,9 @@ const AdminDashboard = () => {
       {/* Content based on active tab */}
       {activeTab === 'workshops' ? (
         <WorkshopManagement />
+      ) : activeTab === 'intern-applications' ? (
+        <InternApplications />
+      ) : (
       ) : activeTab === 'workshop-applications' ? (
         <WorkshopApplications />
       ) : activeTab === 'clubs' ? (
@@ -347,9 +350,7 @@ const AdminDashboard = () => {
       ) : activeTab === 'job-applications' ? (
         <JobApplications />
       ) : (
-       ) : activeTab === 'intern-applications' ? (
-        <InternApplications />
-      ) : (
+       
         <>
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
