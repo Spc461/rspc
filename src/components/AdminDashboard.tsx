@@ -47,7 +47,8 @@ const AdminDashboard = () => {
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'applications' | 'workshops' | 'workshop-applications' | 'clubs' | 'club-applications' | 'job-applications'>('applications');
+  const [activeTab, setActiveTab] = useState<'applications' | 'workshops' | 'workshop-applications' | 'clubs' | 'club-applications' | 'job-applications' | 'intern-applications'>('applications');
+
 
   const formatDate = (date: Date) => {
     try {
