@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { auth, db } from './0-firebase/config';
+import { auth } from './0-firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
 
 import LoadingScreen from './components/LoadingScreen';
@@ -13,38 +13,47 @@ import WorkshopSection from './components/WorkshopSection';
 import ClubSection from './components/ClubSection';
 import JobApplicationForm from './components/JobApplicationForm';
 
-type AppState = 'loading' | 'choice' | 'courses' | 'basic-form' | 'full-form' | 'workshops' | 'clubs' | 'jobs' | 'admin-login' | 'admin-dashboard';
+type AppState = 
+  | 'loading' 
+  | 'choice' 
+  | 'courses' 
+  | 'basic-form' 
+  | 'full-form' 
+  | 'workshops' 
+  | 'clubs' 
+  | 'jobs' 
+  | 'admin-login' 
+  | 'admin-dashboard';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<AppState>('loading');
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Show loading screen for 3 seconds
     const loadingTimer = setTimeout(() => {
       setCurrentPage('choice');
     }, 3000);
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-      
-      // If user is logged in and on admin-login page, redirect to dashboard
-      if (user && currentPage === 'admin-login') {
-        setCurrentPage('admin-dashboard');
-      }
-      // If user is logged out and on admin-dashboard page, redirect to choice
-      if (!user && currentPage === 'admin-dashboard') {
-        setCurrentPage('choice');
-      }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+
+      // Redirect logic based on user authentication
+      setCurrentPage((prevPage) => {
+        if (firebaseUser && prevPage === 'admin-login') {
+          return 'admin-dashboard';
+        }
+        if (!firebaseUser && prevPage === 'admin-dashboard') {
+          return 'choice';
+        }
+        return prevPage;
+      });
     });
 
     return () => {
       clearTimeout(loadingTimer);
       unsubscribe();
     };
-  }, [currentPage]);
+  }, []); // Runs once on mount
 
   const handleChoiceSelect = (type: 'courses' | 'workshops' | 'clubs' | 'jobs' | 'admin' | 'basic' | 'full') => {
     if (type === 'admin') {
@@ -81,7 +90,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-[#22b0fc] to-indigo-900 relative overflow-hidden" dir="rtl">
       <FloatingElements />
-      
+
       <div className="relative z-10 container mx-auto px-4">
         <AnimatePresence mode="wait">
           {currentPage === 'loading' && (
@@ -198,3 +207,5 @@ function App() {
     </div>
   );
 }
+
+export default App;
