@@ -439,7 +439,7 @@ const JobApplicationForm = ({ onBack }) => {
                 </label>
                 <input
                   type="file"
-                  accept=".pdf,.doc,.docx"
+                  accept=".pdf,.doc,.docx,.png,.jpg,.jpegs"
                   
                   onChange={(e) => setCvFile(e.target.files?.[0] || null)}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 file:ml-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-500 file:text-white"
