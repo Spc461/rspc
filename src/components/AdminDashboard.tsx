@@ -33,6 +33,8 @@ import {
 } from 'firebase/firestore';
 
 import { signOut } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
+
 import { auth, db } from '../0-firebase/config';
 import { Application } from '../types';
 import format from 'date-fns/format';
