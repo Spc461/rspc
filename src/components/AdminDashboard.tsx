@@ -31,7 +31,7 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 
-import { signOut, onAuthStateChanged } from '0-firebase/auth';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 
 import { auth, db } from '../0-firebase/config';
