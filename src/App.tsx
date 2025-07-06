@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { auth } from './0-firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import type { User } from 'firebase/auth'; // فقط لو فعلاً تحتاج تعريف الـ type
-
+import type { User } from 'firebase/auth';
 
 import LoadingScreen from './components/LoadingScreen';
 import FloatingElements from './components/FloatingElements';
@@ -16,7 +15,6 @@ import ClubSection from './components/ClubSection';
 import JobApplicationForm from './components/JobApplicationForm';
 import InternApplicationModal from './components/InternApplicationModal';
 
-
 type AppState = 
   | 'loading' 
   | 'choice' 
@@ -26,6 +24,7 @@ type AppState =
   | 'workshops' 
   | 'clubs' 
   | 'jobs' 
+  | 'internapplication'
   | 'admin-login' 
   | 'admin-dashboard';
 
@@ -41,7 +40,6 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
 
-      // Redirect logic based on user authentication
       setCurrentPage((prevPage) => {
         if (firebaseUser && prevPage === 'admin-login') {
           return 'admin-dashboard';
@@ -57,9 +55,9 @@ function App() {
       clearTimeout(loadingTimer);
       unsubscribe();
     };
-  }, []); // Runs once on mount
+  }, []);
 
-  const handleChoiceSelect = (type: 'internapplication' | 'courses' | 'workshops' | 'clubs' | 'jobs' | 'admin' | 'basic' | 'full') => {
+  const handleChoiceSelect = (type: AppState | 'admin' | 'basic' | 'full') => {
     if (type === 'admin') {
       if (user) {
         setCurrentPage('admin-dashboard');
@@ -68,10 +66,8 @@ function App() {
       }
     } else if (type === 'basic' || type === 'full') {
       setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
-    } else if (type === 'courses') {
-      setCurrentPage('courses');
     } else {
-      setCurrentPage(type);
+      setCurrentPage(type as AppState);
     }
   };
 
@@ -94,12 +90,9 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-[#22b0fc] to-indigo-900 relative overflow-hidden" dir="rtl">
       <FloatingElements />
-
       <div className="relative z-10 container mx-auto px-4">
         <AnimatePresence mode="wait">
-          {currentPage === 'loading' && (
-            <LoadingScreen key="loading" />
-          )}
+          {currentPage === 'loading' && <LoadingScreen key="loading" />}
 
           {currentPage === 'choice' && (
             <motion.div
@@ -179,19 +172,18 @@ function App() {
               <JobApplicationForm onBack={handleBackToChoice} />
             </motion.div>
           )}
+
           {currentPage === 'internapplication' && (
-  <motion.div
-    key="internapplication"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.5 }}
-  >
-    <InternApplicationModal onBack={handleBackToChoice} />
-  </motion.div>
-)}
-
-
+            <motion.div
+              key="internapplication"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <InternApplicationModal onBack={handleBackToChoice} />
+            </motion.div>
+          )}
 
           {currentPage === 'admin-login' && (
             <motion.div
