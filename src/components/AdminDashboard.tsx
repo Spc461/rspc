@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { User } from 'firebase/auth';
+
 import { 
   LogOut, 
   Filter, 
