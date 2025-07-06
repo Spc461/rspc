@@ -6,7 +6,7 @@ const LoadingScreen = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      // Removed exit animation to prevent delay
       className="fixed inset-0 bg-gradient-to-br from-blue-900 via-[#22b0fc] to-indigo-900 flex items-center justify-center z-50"
       dir="rtl"
     >
