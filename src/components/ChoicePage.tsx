@@ -314,9 +314,8 @@ const ChoicePage = ({ onChoiceSelect, onBack, showCourseTypes }: ChoicePageProps
                 </ul>
               </div>
             </div>
-          </motion.div>
-        </div>
-<motion.div
+          </motion.div> 
+          <motion.div
   initial={{ y: 100, opacity: 0 }}
   animate={{ y: 0, opacity: 1 }}
   transition={{ delay: 0.9, duration: 0.6 }}
@@ -351,6 +350,8 @@ const ChoicePage = ({ onChoiceSelect, onBack, showCourseTypes }: ChoicePageProps
     </div>
   </div>
 </motion.div>
+
+        </div>
 
         {/* Admin Button */}
         <motion.div
