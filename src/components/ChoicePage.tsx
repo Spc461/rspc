@@ -316,13 +316,13 @@ const ChoicePage = ({ onChoiceSelect, onBack, showCourseTypes }: ChoicePageProps
               </div>
             </div>
           </motion.div> 
-          <motion.div
+         <motion.div
   initial={{ y: 100, opacity: 0 }}
   animate={{ y: 0, opacity: 1 }}
   transition={{ delay: 0.9, duration: 0.6 }}
   whileHover={{ scale: 1.05, rotateY: 5 }}
   className="group cursor-pointer"
-  onClick={() => setJobType('intern')}
+  onClick={() => onChoiceSelect('internapplication')}
 >
   <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 relative overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 group-hover:from-purple-500/10 group-hover:to-fuchsia-500/10 transition-all duration-500"></div>
@@ -351,6 +351,7 @@ const ChoicePage = ({ onChoiceSelect, onBack, showCourseTypes }: ChoicePageProps
     </div>
   </div>
 </motion.div>
+
 
         </div>
 
