@@ -18,7 +18,8 @@ import {
   FileText,
   UserCheck,
   Briefcase,
-  Award
+  Award,
+  User
 } from 'lucide-react';
 
 import { 
@@ -56,7 +57,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'applications' | 'workshops' | 'workshop-applications' | 'clubs' | 'club-applications' | 'job-applications' | 'intern-applications'>('applications');
-
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const formatDate = (date: Date) => {
     try {
@@ -68,6 +69,11 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    // Listen to auth state changes
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+
     const q = query(collection(db, 'applications'), orderBy('submissionDate', 'desc'));
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -85,7 +91,10 @@ const AdminDashboard = () => {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      unsubscribeAuth();
+    };
   }, []);
 
   useEffect(() => {
@@ -126,7 +135,7 @@ const AdminDashboard = () => {
       await updateDoc(doc(db, 'applications', appId), {
         status: newStatus,
         reviewedAt: new Date(),
-        reviewedBy: auth.currentUser?.uid
+        reviewedBy: currentUser?.uid
       });
     } catch (error) {
       console.error('Error updating status:', error);
@@ -246,7 +255,7 @@ const AdminDashboard = () => {
 
       {/* Navigation Tabs */}
       <div className="bg-white rounded-2xl p-2 mb-6 shadow-md">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -326,20 +335,18 @@ const AdminDashboard = () => {
             طلبات التوظيف
           </motion.button>
           <motion.button
-  whileHover={{ scale: 1.02 }}
-  whileTap={{ scale: 0.98 }}
-  onClick={() => setActiveTab('intern-applications')}
-  className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
-    activeTab === 'intern-applications'
-      ? 'bg-[#22b0fc] text-white shadow-lg'
-      : 'text-gray-600 hover:bg-gray-100'
-  }`}
->
-  <User size={16} />
-  طلبات التدريب
-</motion.button>
-
-          
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('intern-applications')}
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
+              activeTab === 'intern-applications'
+                ? 'bg-[#22b0fc] text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <User size={16} />
+            طلبات التدريب
+          </motion.button>
         </div>
       </div>
 
@@ -348,7 +355,6 @@ const AdminDashboard = () => {
         <WorkshopManagement />
       ) : activeTab === 'intern-applications' ? (
         <InternApplications />
-      
       ) : activeTab === 'workshop-applications' ? (
         <WorkshopApplications />
       ) : activeTab === 'clubs' ? (
@@ -358,7 +364,6 @@ const AdminDashboard = () => {
       ) : activeTab === 'job-applications' ? (
         <JobApplications />
       ) : (
-       
         <>
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

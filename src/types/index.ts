@@ -119,6 +119,22 @@ export interface JobApplication {
   status: 'pending' | 'approved' | 'rejected';
 }
 
+export interface InternApplication {
+  id?: string;
+  fullName: string;
+  age: number;
+  phone: string;
+  email?: string;
+  dateOfBirth: string;
+  placeOfBirth: string;
+  address: string;
+  skills?: string;
+  signature: string;
+  agreedToContract: boolean;
+  applicationDate: Date;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 export interface LanguageLevel {
   id: string;
   name: string;
