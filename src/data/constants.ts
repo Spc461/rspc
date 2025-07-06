@@ -110,10 +110,27 @@ export const TEACHING_LANGUAGES = [
   'الإيطالية - Italian',
   'الألمانية - German',
   'الروسية - Russian',
-  'العربية - Arabic'
-  'محاسبة – Accounting'
-  'إدارة أعمال – Business Management'
-  تسويق رقمي – Digital Marketins
+  'العربية - Arabic',
+  'محاسبة – Accounting',
+  'محاسبة – Accounting',
+'إدارة أعمال – Business Management',
+'تسويق رقمي – Digital Marketing',
+'تداول – Trading',
+'الاقتصاد الشخصي – Personal Finance',
+'برمجة – Programming',
+'برمجة جافاسكربت – JavaScript Programming',
+'برمجة بايثون – Python Programming',
+'تطوير مواقع – Web Development',
+'تطوير تطبيقات موبايل – Mobile App Development',
+'الذكاء الاصطناعي – Artificial Intelligence (AI)',
+'علوم البيانات – Data Science',
+'الأمن السيبراني – Cybersecurity',
+'تصميم جرافيك – Graphic Design',
+'تصميم داخلي – Interior Design',
+'مونتاج فيديو – Video Editing',
+'تصوير فوتوغرافي – Photography',
+
+
 ];
 
 export const STAFF_FIELDS = [
