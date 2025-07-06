@@ -45,6 +45,7 @@ import WorkshopApplications from './WorkshopApplications';
 import ClubManagement from './ClubManagement';
 import ClubApplications from './ClubApplications';
 import JobApplications from './JobApplications';
+import InternApplications from './InternApplications';
 
 const AdminDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
