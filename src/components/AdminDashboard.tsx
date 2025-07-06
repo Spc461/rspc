@@ -32,14 +32,12 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 
-import { signOut, onAuthStateChanged } from 'firebase/auth';
-import type { User } from 'firebase/auth';
-
+import { signOut } from 'firebase/auth';
 import { auth, db } from '../0-firebase/config';
 import { Application } from '../types';
-
 import format from 'date-fns/format';
 import arSA from 'date-fns/locale/ar-SA';
+
 
 import WorkshopManagement from './WorkshopManagement';
 import WorkshopApplications from './WorkshopApplications';
