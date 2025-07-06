@@ -3,20 +3,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { auth, db } from './0-firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
 
+import LoadingScreen from './components/LoadingScreen';
 import FloatingElements from './components/FloatingElements';
 import ChoicePage from './components/ChoicePage';
 import RegistrationForm from './components/RegistrationForm';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
+import WorkshopSection from './components/WorkshopSection';
+import ClubSection from './components/ClubSection';
+import JobApplicationForm from './components/JobApplicationForm';
 
-type AppState = 'choice' | 'basic-form' | 'full-form' | 'admin-login' | 'admin-dashboard';
+type AppState = 'loading' | 'choice' | 'basic-form' | 'full-form' | 'workshops' | 'clubs' | 'jobs' | 'admin-login' | 'admin-dashboard';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<AppState>('choice');
+  const [currentPage, setCurrentPage] = useState<AppState>('loading');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Show loading screen for 3 seconds
+    const loadingTimer = setTimeout(() => {
+      setCurrentPage('choice');
+    }, 3000);
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -31,10 +40,13 @@ function App() {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(loadingTimer);
+      unsubscribe();
+    };
   }, [currentPage]);
 
-  const handleChoiceSelect = (type: 'basic' | 'full' | 'admin') => {
+  const handleChoiceSelect = (type: 'courses' | 'workshops' | 'clubs' | 'jobs' | 'admin') => {
     if (type === 'admin') {
       if (user) {
         setCurrentPage('admin-dashboard');
@@ -42,8 +54,12 @@ function App() {
         setCurrentPage('admin-login');
       }
     } else {
-      setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
+      setCurrentPage(type);
     }
+  };
+
+  const handleCourseTypeSelect = (type: 'basic' | 'full') => {
+    setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
   };
 
   const handleBackToChoice = () => {
@@ -54,23 +70,16 @@ function App() {
     setCurrentPage('admin-dashboard');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-[#22b0fc] to-indigo-900 flex items-center justify-center" dir="rtl">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>جاري التحميل...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-[#22b0fc] to-indigo-900 relative overflow-hidden" dir="rtl">
       <FloatingElements />
       
       <div className="relative z-10 container mx-auto px-4">
         <AnimatePresence mode="wait">
+          {currentPage === 'loading' && (
+            <LoadingScreen key="loading" />
+          )}
+
           {currentPage === 'choice' && (
             <motion.div
               key="choice"
@@ -80,6 +89,22 @@ function App() {
               transition={{ duration: 0.5 }}
             >
               <ChoicePage onChoiceSelect={handleChoiceSelect} />
+            </motion.div>
+          )}
+
+          {currentPage === 'courses' && (
+            <motion.div
+              key="courses"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <ChoicePage 
+                onChoiceSelect={handleCourseTypeSelect} 
+                onBack={handleBackToChoice}
+                showCourseTypes={true}
+              />
             </motion.div>
           )}
 
@@ -95,6 +120,42 @@ function App() {
                 type={currentPage === 'basic-form' ? 'basic' : 'full'} 
                 onBack={handleBackToChoice}
               />
+            </motion.div>
+          )}
+
+          {currentPage === 'workshops' && (
+            <motion.div
+              key="workshops"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <WorkshopSection onBack={handleBackToChoice} />
+            </motion.div>
+          )}
+
+          {currentPage === 'clubs' && (
+            <motion.div
+              key="clubs"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <ClubSection onBack={handleBackToChoice} />
+            </motion.div>
+          )}
+
+          {currentPage === 'jobs' && (
+            <motion.div
+              key="jobs"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <JobApplicationForm onBack={handleBackToChoice} />
             </motion.div>
           )}
 

@@ -59,6 +59,66 @@ export interface WorkshopRegistration {
   status: 'registered' | 'attended' | 'cancelled';
 }
 
+export interface Club {
+  id?: string;
+  name: string;
+  arabicName: string;
+  description: string;
+  imageUrl: string;
+  departments: ClubDepartment[];
+  isActive: boolean;
+  createdAt: Date;
+}
+
+export interface ClubDepartment {
+  id: string;
+  name: string;
+  arabicName: string;
+  description: string;
+}
+
+export interface ClubApplication {
+  id?: string;
+  clubId: string;
+  clubName: string;
+  departmentId: string;
+  departmentName: string;
+  fullName: string;
+  age: number;
+  phone: string;
+  email?: string;
+  dateOfBirth: string;
+  placeOfBirth: string;
+  skills: string;
+  address: string;
+  languageLevel: string;
+  healthProblems?: string;
+  signature: string;
+  agreedToContract: boolean;
+  applicationDate: Date;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
+export interface JobApplication {
+  id?: string;
+  jobType: 'teacher' | 'staff';
+  fullName: string;
+  age: number;
+  phone: string;
+  email?: string;
+  dateOfBirth: string;
+  placeOfBirth: string;
+  address: string;
+  teachingLanguage?: string; // For teachers
+  staffField?: string; // For staff
+  skills?: string;
+  cvUrl: string;
+  signature: string;
+  agreedToContract: boolean;
+  applicationDate: Date;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 export interface LanguageLevel {
   id: string;
   name: string;

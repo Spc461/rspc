@@ -1,20 +1,130 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, CreditCard, Shield, Calendar } from 'lucide-react';
-import WorkshopSection from './WorkshopSection';
-import WorkshopRegistrationModal from './WorkshopRegistrationModal';
-import { Workshop } from '../types';
+import { GraduationCap, CreditCard, Calendar, Users, Briefcase, Shield, ArrowLeft } from 'lucide-react';
 
 interface ChoicePageProps {
-  onChoiceSelect: (type: 'basic' | 'full' | 'admin') => void;
+  onChoiceSelect: (type: 'courses' | 'workshops' | 'clubs' | 'jobs' | 'admin' | 'basic' | 'full') => void;
+  onBack?: () => void;
+  showCourseTypes?: boolean;
 }
 
-const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
-  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
+const ChoicePage = ({ onChoiceSelect, onBack, showCourseTypes }: ChoicePageProps) => {
+  if (showCourseTypes) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="min-h-screen flex flex-col items-center justify-center p-4"
+        dir="rtl"
+      >
+        <div className="max-w-4xl w-full">
+          {/* Back Button */}
+          {onBack && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onBack}
+              className="mb-6 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl font-semibold flex items-center transition-colors duration-300"
+            >
+              <ArrowLeft className="w-5 h-5 ml-2" />
+              العودة للخلف
+            </motion.button>
+          )}
 
-  const handleWorkshopRegister = (workshop: Workshop) => {
-    setSelectedWorkshop(workshop);
-  };
+          {/* Header */}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-4xl font-bold text-white mb-4">
+              اختر نوع التسجيل في الدورات
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+              اختر طريقة التسجيل التي تناسبك في الدورات المدفوعة
+            </p>
+          </motion.div>
+
+          {/* Course Type Cards */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <motion.div
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              whileHover={{ scale: 1.05, rotateY: 5 }}
+              className="group cursor-pointer"
+              onClick={() => onChoiceSelect('basic')}
+            >
+              <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-[#22b0fc]/25 transition-all duration-500 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#22b0fc]/5 to-cyan-500/5 group-hover:from-[#22b0fc]/10 group-hover:to-cyan-500/10 transition-all duration-500"></div>
+                <div className="relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-r from-[#22b0fc] to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <GraduationCap className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-800 mb-4">تسجيل أولي</h3>
+                  <p className="text-gray-600 text-lg mb-6">
+                    تسجيل كمرحلة اولى يحتاج منك التوجه الى المركز بعد التواصل
+                  </p>
+                  <ul className="space-y-2 text-gray-700">
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
+                      حجز مكانك في الدورة
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
+                      معلومات تفصيلية عن المنهج
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
+                      إمكانية التواصل المباشر
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ x: 100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.6 }}
+              whileHover={{ scale: 1.05, rotateY: -5 }}
+              className="group cursor-pointer"
+              onClick={() => onChoiceSelect('full')}
+            >
+              <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-green-500/25 transition-all duration-500 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 group-hover:from-green-500/10 group-hover:to-emerald-500/10 transition-all duration-500"></div>
+                <div className="relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <CreditCard className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-800 mb-4">تسجيل كلي</h3>
+                  <p className="text-gray-600 text-lg mb-6">
+                    تسجيل كامل مع دفع اما مرة واحدة او جزئيا وضمان مكانك في الدورة
+                  </p>
+                  <ul className="space-y-2 text-gray-700">
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
+                      ضمان مكانك بنسبة 100%
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
+                      امكانية التسجيل عن بعد كليا
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
+                      متابعة مستمرة بعد الدورة
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -40,7 +150,6 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
                 alt="Rising Academy Logo" 
                 className="w-16 h-16 object-contain"
                 onError={(e) => {
-                  // Fallback to graduation cap if logo fails to load
                   e.currentTarget.style.display = 'none';
                   e.currentTarget.nextElementSibling?.classList.remove('hidden');
                 }}
@@ -50,81 +159,157 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
           </div>
           
           <h1 className="text-5xl font-bold text-white mb-4">
-            اختر نوع التسجيل
+            أكاديمية رايزين
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-            اختر طريقة التسجيل التي تناسبك في أكاديمية رايزين للتسجيل والاستشارات
+            اختر الخدمة التي تناسبك من خدماتنا المتنوعة
           </p>
         </motion.div>
 
-        {/* Choice Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        {/* Main Choice Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8 mb-12">
+          {/* Paid Courses */}
           <motion.div
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.6 }}
             whileHover={{ scale: 1.05, rotateY: 5 }}
             className="group cursor-pointer"
-            onClick={() => onChoiceSelect('basic')}
+            onClick={() => onChoiceSelect('courses')}
           >
-            <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-[#22b0fc]/25 transition-all duration-500 relative overflow-hidden">
+            <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-[#22b0fc]/25 transition-all duration-500 relative overflow-hidden h-full">
               <div className="absolute inset-0 bg-gradient-to-br from-[#22b0fc]/5 to-cyan-500/5 group-hover:from-[#22b0fc]/10 group-hover:to-cyan-500/10 transition-all duration-500"></div>
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-gradient-to-r from-[#22b0fc] to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <GraduationCap className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-gray-800 mb-4">تسجيل أولي</h3>
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">دورات مدفوعة</h3>
                 <p className="text-gray-600 text-lg mb-6">
-                تسجيل كمرحلة اولى يحتاج منك التوجه الى المركز بعد التواصل
+                  دورات تدريبية متخصصة في مختلف المجالات التقنية واللغوية
                 </p>
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex items-center">
                     <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
-                    حجز مكانك في الدورة
+                    دورات البرمجة والتكنولوجيا
                   </li>
                   <li className="flex items-center">
                     <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
-                    معلومات تفصيلية عن المنهج
+                    دورات اللغات الأجنبية
                   </li>
                   <li className="flex items-center">
                     <div className="w-2 h-2 bg-[#22b0fc] rounded-full ml-3"></div>
-                    إمكانية التواصل المباشر
+                    شهادات معتمدة
                   </li>
                 </ul>
               </div>
             </div>
           </motion.div>
 
+          {/* Free Workshops */}
           <motion.div
             initial={{ x: 100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.6 }}
             whileHover={{ scale: 1.05, rotateY: -5 }}
             className="group cursor-pointer"
-            onClick={() => onChoiceSelect('full')}
+            onClick={() => onChoiceSelect('workshops')}
           >
-            <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-green-500/25 transition-all duration-500 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 group-hover:from-green-500/10 group-hover:to-emerald-500/10 transition-all duration-500"></div>
+            <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-yellow-500/25 transition-all duration-500 relative overflow-hidden h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 group-hover:from-yellow-500/10 group-hover:to-orange-500/10 transition-all duration-500"></div>
               <div className="relative z-10">
-                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <CreditCard className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Calendar className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-gray-800 mb-4">تسجيل كلي</h3>
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">ورشات مجانية</h3>
                 <p className="text-gray-600 text-lg mb-6">
-                  تسجيل كامل مع دفع اما مرة واحدة او جزئيا وضمان مكانك في الدورة
+                  ورش تدريبية مجانية أسبوعية لتطوير المهارات
                 </p>
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
-                    ضمان مكانك بنسبة 100%
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full ml-3"></div>
+                    ورش أسبوعية مجانية
                   </li>
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
-                    امكانية التسجيل عن بعد كليا
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full ml-3"></div>
+                    مواضيع متنوعة ومفيدة
                   </li>
                   <li className="flex items-center">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3"></div>
-                    متابعة مستمرة بعد الدورة
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full ml-3"></div>
+                    شهادات حضور
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Club Membership */}
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+            whileHover={{ scale: 1.05, rotateY: 5 }}
+            className="group cursor-pointer"
+            onClick={() => onChoiceSelect('clubs')}
+          >
+            <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 relative overflow-hidden h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 group-hover:from-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">الانخراط في النوادي</h3>
+                <p className="text-gray-600 text-lg mb-6">
+                  انضم إلى نوادينا المتخصصة وطور مهاراتك مع المجتمع
+                </p>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full ml-3"></div>
+                    نوادي متخصصة متنوعة
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full ml-3"></div>
+                    أنشطة جماعية ومشاريع
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full ml-3"></div>
+                    تطوير المهارات الاجتماعية
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Job Applications */}
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.1, duration: 0.6 }}
+            whileHover={{ scale: 1.05, rotateY: -5 }}
+            className="group cursor-pointer"
+            onClick={() => onChoiceSelect('jobs')}
+          >
+            <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-green-500/25 transition-all duration-500 relative overflow-hidden h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 group-hover:from-green-500/10 group-hover:to-emerald-500/10 transition-all duration-500"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Briefcase className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">التقديم على وظيفة</h3>
+                <p className="text-gray-600 text-lg mb-6">
+                  انضم إلى فريق العمل كمدرس أو موظف إداري
+                </p>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full ml-3"></div>
+                    وظائف تدريس متنوعة
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full ml-3"></div>
+                    وظائف إدارية وتقنية
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full ml-3"></div>
+                    بيئة عمل محفزة
                   </li>
                 </ul>
               </div>
@@ -132,28 +317,11 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
           </motion.div>
         </div>
 
-        {/* Workshops Section */}
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.6 }}
-          className="mb-12"
-        >
-          <div className="bg-white rounded-3xl p-8 shadow-2xl">
-            <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
-                <Calendar className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <WorkshopSection onRegister={handleWorkshopRegister} />
-          </div>
-        </motion.div>
-
         {/* Admin Button */}
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1.1, duration: 0.6 }}
+          transition={{ delay: 1.3, duration: 0.6 }}
           className="text-center"
         >
           <motion.button
@@ -167,14 +335,6 @@ const ChoicePage = ({ onChoiceSelect }: ChoicePageProps) => {
           </motion.button>
         </motion.div>
       </div>
-
-      {/* Workshop Registration Modal */}
-      {selectedWorkshop && (
-        <WorkshopRegistrationModal
-          workshop={selectedWorkshop}
-          onClose={() => setSelectedWorkshop(null)}
-        />
-      )}
     </motion.div>
   );
 };

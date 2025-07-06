@@ -15,7 +15,9 @@ import {
   Printer,
   Settings,
   FileText,
-  UserCheck
+  UserCheck,
+  Briefcase,
+  Award
 } from 'lucide-react';
 import { 
   collection, 
@@ -33,6 +35,9 @@ import format from 'date-fns/format';
 import arSA from 'date-fns/locale/ar-SA';
 import WorkshopManagement from './WorkshopManagement';
 import WorkshopApplications from './WorkshopApplications';
+import ClubManagement from './ClubManagement';
+import ClubApplications from './ClubApplications';
+import JobApplications from './JobApplications';
 
 const AdminDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -42,7 +47,7 @@ const AdminDashboard = () => {
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'applications' | 'workshops' | 'workshop-applications'>('applications');
+  const [activeTab, setActiveTab] = useState<'applications' | 'workshops' | 'workshop-applications' | 'clubs' | 'club-applications' | 'job-applications'>('applications');
 
   const formatDate = (date: Date) => {
     try {
@@ -63,7 +68,6 @@ const AdminDashboard = () => {
         apps.push({ 
           id: doc.id, 
           ...data,
-          // Force status to 'pending' if not set
           status: data.status || 'pending',
           submissionDate: data.submissionDate?.toDate() 
         } as Application);
@@ -130,47 +134,41 @@ const AdminDashboard = () => {
     }
   };
 
- const exportToCSV = () => {
-  // CSV headers (Arabic text)
-  const headers = [
-    'الاسم الكامل', 
-    'الهاتف', 
-    'البريد الإلكتروني', 
-    'الدورة', 
-    'نوع التسجيل', 
-    'الحالة', 
-    'تاريخ التسجيل'
-  ].join(',');
+  const exportToCSV = () => {
+    const headers = [
+      'الاسم الكامل', 
+      'الهاتف', 
+      'البريد الإلكتروني', 
+      'الدورة', 
+      'نوع التسجيل', 
+      'الحالة', 
+      'تاريخ التسجيل'
+    ].join(',');
 
-  // CSV rows
-  const rows = filteredApplications.map(app => [
-    `"${app.fullName || ''}"`,       // Wrap in quotes to handle commas
-    `"${app.phone || ''}"`,         // Wrap in quotes
-    `"${app.email || ''}"`,         // Wrap in quotes
-    `"${app.course || ''}"`,        // Wrap in quotes
-    app.registrationType === 'Basic' ? 'أولي' : 'كامل',
-    app.status === 'pending' ? 'قيد المراجعة' : 
-      app.status === 'approved' ? 'مقبول' : 'مرفوض',
-    `"${format(app.submissionDate, 'yyyy-MM-dd HH:mm', { locale: arSA })}"` // Wrap in quotes
-  ].join(','));
+    const rows = filteredApplications.map(app => [
+      `"${app.fullName || ''}"`,
+      `"${app.phone || ''}"`,
+      `"${app.email || ''}"`,
+      `"${app.course || ''}"`,
+      app.registrationType === 'Basic' ? 'أولي' : 'كامل',
+      app.status === 'pending' ? 'قيد المراجعة' : 
+        app.status === 'approved' ? 'مقبول' : 'مرفوض',
+      `"${format(app.submissionDate, 'yyyy-MM-dd HH:mm', { locale: arSA })}"`
+    ].join(','));
 
-  // Combine headers and rows
-  const csvContent = [headers, ...rows].join('\n');
+    const csvContent = [headers, ...rows].join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { 
+      type: 'text/csv;charset=utf-8;' 
+    });
 
-  // Fix encoding for Arabic characters
-  const blob = new Blob(["\uFEFF" + csvContent], { 
-    type: 'text/csv;charset=utf-8;' 
-  });
-
-  // Create download link
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.setAttribute('download', `طلبات_التسجيل_${format(new Date(), 'yyyy-MM-dd')}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `طلبات_التسجيل_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const stats = {
     total: applications.length,
@@ -210,7 +208,7 @@ const AdminDashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">لوحة التحكم الإدارية</h1>
-            <p className="text-gray-600 mt-1">إدارة طلبات التسجيل والورش في البرنامج</p>
+            <p className="text-gray-600 mt-1">إدارة جميع طلبات التسجيل والخدمات</p>
           </div>
           <div className="flex gap-3 w-full md:w-auto">
             {activeTab === 'applications' && (
@@ -239,53 +237,99 @@ const AdminDashboard = () => {
 
       {/* Navigation Tabs */}
       <div className="bg-white rounded-2xl p-2 mb-6 shadow-md">
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('applications')}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
               activeTab === 'applications'
                 ? 'bg-[#22b0fc] text-white shadow-lg'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
-            <FileText size={18} />
-            طلبات التسجيل
+            <FileText size={16} />
+            طلبات الدورات
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('workshops')}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
               activeTab === 'workshops'
                 ? 'bg-[#22b0fc] text-white shadow-lg'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
-            <Settings size={18} />
+            <Settings size={16} />
             إدارة الورش
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('workshop-applications')}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
               activeTab === 'workshop-applications'
                 ? 'bg-[#22b0fc] text-white shadow-lg'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
-            <UserCheck size={18} />
+            <UserCheck size={16} />
             تسجيلات الورش
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('clubs')}
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
+              activeTab === 'clubs'
+                ? 'bg-[#22b0fc] text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <Users size={16} />
+            إدارة النوادي
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('club-applications')}
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
+              activeTab === 'club-applications'
+                ? 'bg-[#22b0fc] text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <Award size={16} />
+            طلبات النوادي
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('job-applications')}
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
+              activeTab === 'job-applications'
+                ? 'bg-[#22b0fc] text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <Briefcase size={16} />
+            طلبات التوظيف
           </motion.button>
         </div>
       </div>
 
+      {/* Content based on active tab */}
       {activeTab === 'workshops' ? (
         <WorkshopManagement />
       ) : activeTab === 'workshop-applications' ? (
         <WorkshopApplications />
+      ) : activeTab === 'clubs' ? (
+        <ClubManagement />
+      ) : activeTab === 'club-applications' ? (
+        <ClubApplications />
+      ) : activeTab === 'job-applications' ? (
+        <JobApplications />
       ) : (
         <>
           {/* Stats Cards */}
