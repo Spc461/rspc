@@ -111,6 +111,9 @@ export const TEACHING_LANGUAGES = [
   'الألمانية - German',
   'الروسية - Russian',
   'العربية - Arabic'
+  'محاسبة – Accounting'
+  'إدارة أعمال – Business Management'
+  تسويق رقمي – Digital Marketins
 ];
 
 export const STAFF_FIELDS = [
