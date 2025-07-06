@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { auth } from './0-firebase/config';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
+import type { User } from 'firebase/auth'; // فقط لو فعلاً تحتاج تعريف الـ type
+
 
 import LoadingScreen from './components/LoadingScreen';
 import FloatingElements from './components/FloatingElements';
