@@ -41,7 +41,7 @@ const JobApplicationForm = ({ onBack }) => {
     setIsSubmitting(true);
 
     try {
-      if (!cvFile) throw new Error('CV file is required');
+     
       if (!signatureRef.current || signatureRef.current.isEmpty()) throw new Error('Signature is required');
 
       const cvBase64 = await convertFileToBase64(cvFile);
