@@ -13,7 +13,7 @@ import WorkshopSection from './components/WorkshopSection';
 import ClubSection from './components/ClubSection';
 import JobApplicationForm from './components/JobApplicationForm';
 
-type AppState = 'loading' | 'choice' | 'basic-form' | 'full-form' | 'workshops' | 'clubs' | 'jobs' | 'admin-login' | 'admin-dashboard';
+type AppState = 'loading' | 'choice' | 'courses' | 'basic-form' | 'full-form' | 'workshops' | 'clubs' | 'jobs' | 'admin-login' | 'admin-dashboard';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<AppState>('loading');
@@ -46,13 +46,17 @@ function App() {
     };
   }, [currentPage]);
 
-  const handleChoiceSelect = (type: 'courses' | 'workshops' | 'clubs' | 'jobs' | 'admin') => {
+  const handleChoiceSelect = (type: 'courses' | 'workshops' | 'clubs' | 'jobs' | 'admin' | 'basic' | 'full') => {
     if (type === 'admin') {
       if (user) {
         setCurrentPage('admin-dashboard');
       } else {
         setCurrentPage('admin-login');
       }
+    } else if (type === 'basic' || type === 'full') {
+      setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
+    } else if (type === 'courses') {
+      setCurrentPage('courses');
     } else {
       setCurrentPage(type);
     }
@@ -64,6 +68,10 @@ function App() {
 
   const handleBackToChoice = () => {
     setCurrentPage('choice');
+  };
+
+  const handleBackToCourses = () => {
+    setCurrentPage('courses');
   };
 
   const handleAdminLoginSuccess = () => {
@@ -118,7 +126,7 @@ function App() {
             >
               <RegistrationForm 
                 type={currentPage === 'basic-form' ? 'basic' : 'full'} 
-                onBack={handleBackToChoice}
+                onBack={handleBackToCourses}
               />
             </motion.div>
           )}
