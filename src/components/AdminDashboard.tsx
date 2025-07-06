@@ -30,7 +30,8 @@ import {
   doc,
   deleteDoc
 } from 'firebase/firestore';
-import { User } from 'firebase/auth';
+const [user, setUser] = useState(null);
+
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../0-firebase/config';
 import { Application } from '../types';
