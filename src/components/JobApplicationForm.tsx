@@ -4,15 +4,10 @@ import { ArrowLeft, Briefcase, Upload, Check, X } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../0-firebase/config';
-import { JobApplication } from '../types';
 import { TEACHING_LANGUAGES, STAFF_FIELDS, JOB_CONTRACT_TEXT } from '../data/constants';
 
-interface JobApplicationFormProps {
-  onBack: () => void;
-}
-
-const JobApplicationForm = ({ onBack }: JobApplicationFormProps) => {
-  const [jobType, setJobType] = useState<'teacher' | 'staff' | ''>('');
+const JobApplicationForm = ({ onBack }) => {
+  const [jobType, setJobType] = useState('');
   const [formData, setFormData] = useState({
     fullName: '',
     age: '',
@@ -26,48 +21,41 @@ const JobApplicationForm = ({ onBack }: JobApplicationFormProps) => {
     skills: '',
     agreedToContract: false
   });
-  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvFile, setCvFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
+  const [submitStatus, setSubmitStatus] = useState(null);
   const [showContract, setShowContract] = useState(false);
-  const signatureRef = useRef<SignatureCanvas>(null);
+  const signatureRef = useRef(null);
 
-  const convertFileToBase64 = (file: File): Promise<string> => {
+  const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
+      reader.onload = () => resolve(reader.result);
       reader.onerror = error => reject(error);
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      if (!cvFile) {
-        throw new Error('CV file is required');
-      }
-
-      if (!signatureRef.current || signatureRef.current.isEmpty()) {
-        throw new Error('Signature is required');
-      }
+      if (!cvFile) throw new Error('CV file is required');
+      if (!signatureRef.current || signatureRef.current.isEmpty()) throw new Error('Signature is required');
 
       const cvBase64 = await convertFileToBase64(cvFile);
 
-      const applicationData: Omit<JobApplication, 'id'> = {
-        jobType: jobType as 'teacher' | 'staff',
+      const baseData = {
+        jobType,
         fullName: formData.fullName,
         age: parseInt(formData.age),
         phone: formData.phone,
-        email: formData.email,
+        email: formData.email || null,
         dateOfBirth: formData.dateOfBirth,
         placeOfBirth: formData.placeOfBirth,
         address: formData.address,
-        teachingLanguage: jobType === 'teacher' ? formData.teachingLanguage : undefined,
-        staffField: jobType === 'staff' ? formData.staffField : undefined,
-        skills: formData.skills,
+        skills: formData.skills || null,
         cvUrl: cvBase64,
         signature: signatureRef.current.toDataURL(),
         agreedToContract: formData.agreedToContract,
@@ -75,28 +63,45 @@ const JobApplicationForm = ({ onBack }: JobApplicationFormProps) => {
         status: 'pending'
       };
 
-      await addDoc(collection(db, 'jobApplications'), applicationData);
+      // Add conditional fields without undefined
+      if (jobType === 'teacher') {
+        baseData.teachingLanguage = formData.teachingLanguage;
+      }
+      if (jobType === 'staff') {
+        baseData.staffField = formData.staffField;
+      }
+
+      await addDoc(collection(db, 'jobApplications'), baseData);
 
       setSubmitStatus('success');
-      
       setTimeout(() => {
         setJobType('');
         setFormData({
-          fullName: '', age: '', phone: '', email: '', dateOfBirth: '',
-          placeOfBirth: '', address: '', teachingLanguage: '', staffField: '',
-          skills: '', agreedToContract: false
+          fullName: '',
+          age: '',
+          phone: '',
+          email: '',
+          dateOfBirth: '',
+          placeOfBirth: '',
+          address: '',
+          teachingLanguage: '',
+          staffField: '',
+          skills: '',
+          agreedToContract: false
         });
         setCvFile(null);
         setSubmitStatus(null);
       }, 3000);
 
-    } catch (error) {
-      console.error('Error submitting job application:', error);
+    } catch (err) {
+      console.error('Error submitting job application:', err);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+
 
   if (!jobType) {
     return (
