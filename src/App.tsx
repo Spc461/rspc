@@ -184,7 +184,7 @@ function App() {
     transition={{ duration: 0.5 }}
   >
     <JobApplicationForm onBack={handleBackToChoice} />
-    {/* لو عندك كومبوننت خاص للتربص غير JobApplicationForm، استبدله هنا */}
+   
   </motion.div>
 )}
 
