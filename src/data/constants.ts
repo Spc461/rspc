@@ -128,7 +128,7 @@ export const TEACHING_LANGUAGES = [
 'تصميم جرافيك – Graphic Design',
 'تصميم داخلي – Interior Design',
 'مونتاج فيديو – Video Editing',
-'تصوير فوتوغرافي – Photography',
+'تصوير فوتوغرافي – Photography'
 
 
 ];
