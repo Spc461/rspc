@@ -18,12 +18,23 @@ const InternApplicationModal = ({ onBack }: InternApplicationModalProps) => {
     dateOfBirth: '',
     placeOfBirth: '',
     address: '',
+    academicSpecialization: '',
     skills: '',
     agreedToContract: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
   const signatureRef = useRef<SignatureCanvas>(null);
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,9 +45,15 @@ const InternApplicationModal = ({ onBack }: InternApplicationModalProps) => {
         throw new Error('Signature is required');
       }
       
+      let cvBase64 = null;
+      if (cvFile) {
+        cvBase64 = await convertFileToBase64(cvFile);
+      }
+      
       const applicationData = {
         ...formData,
         age: parseInt(formData.age),
+        cvUrl: cvBase64,
         signature: signatureRef.current.toDataURL(),
         applicationDate: new Date(),
         status: 'pending'
@@ -48,8 +65,9 @@ const InternApplicationModal = ({ onBack }: InternApplicationModalProps) => {
       setTimeout(() => {
         setFormData({
           fullName: '', age: '', phone: '', email: '', dateOfBirth: '',
-          placeOfBirth: '', address: '', skills: '', agreedToContract: false
+          placeOfBirth: '', address: '', academicSpecialization: '', skills: '', agreedToContract: false
         });
+        setCvFile(null);
         setSubmitStatus(null);
         onBack();
       }, 2000);
@@ -208,15 +226,67 @@ const InternApplicationModal = ({ onBack }: InternApplicationModalProps) => {
 
               <div>
                 <label className="block text-gray-800 font-semibold mb-2">
-                  المهارات والخبرات (اختياري)
+                  التخصص الدراسي <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.academicSpecialization}
+                  onChange={(e) => setFormData(prev => ({ ...prev, academicSpecialization: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                  placeholder="مثال: هندسة معلوماتية، إدارة أعمال، إلخ..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-800 font-semibold mb-2">
+                  المهارات والخبرات <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   rows={4}
+                  required
                   value={formData.skills}
                   onChange={(e) => setFormData(prev => ({ ...prev, skills: e.target.value }))}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 resize-none"
                   placeholder="اذكر مهاراتك وخبراتك..."
                 />
+              </div>
+
+              {/* CV Upload */}
+              <div>
+                <label className="block text-gray-800 font-semibold mb-2">
+                  السيرة الذاتية (CV) - اختياري
+                </label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                  onChange={(e) => setCvFile(e.target.files?.[0] || null)}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-800 file:ml-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-500 file:text-white"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  يمكنك رفع السيرة الذاتية بصيغة PDF أو Word أو صورة
+                </p>
+              </div>
+
+              {/* Technology Requirements Note */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-xs font-bold">!</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-blue-800 mb-2">متطلبات تقنية مهمة</h4>
+                    <p className="text-sm text-blue-700">
+                      يجب على المتدرب أن يكون لديه معرفة أساسية باستخدام التكنولوجيا مثل:
+                    </p>
+                    <ul className="text-sm text-blue-700 mt-2 space-y-1">
+                      <li>• استخدام الحاسوب والإنترنت</li>
+                      <li>• التعامل مع البريد الإلكتروني</li>
+                      <li>• استخدام برامج Office الأساسية (Word, Excel)</li>
+                      <li>• القدرة على التعلم والتكيف مع الأدوات الجديدة</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
 
               {/* Signature */}

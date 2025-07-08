@@ -76,12 +76,13 @@ const InternApplications = () => {
   };
 
   const exportToCSV = () => {
-    const headers = ['الاسم', 'العمر', 'الهاتف', 'البريد الإلكتروني', 'الحالة', 'التاريخ'].join(',');
+    const headers = ['الاسم', 'العمر', 'الهاتف', 'البريد الإلكتروني', 'التخصص الدراسي', 'الحالة', 'التاريخ'].join(',');
     const rows = filteredApplications.map(app => [
       `"${app.fullName}"`,
       `"${app.age}"`,
       `"${app.phone}"`,
       `"${app.email || ''}"`,
+      `"${app.academicSpecialization}"`,
       app.status === 'pending' ? 'قيد المراجعة' : app.status === 'approved' ? 'مقبول' : 'مرفوض',
       `"${format(app.applicationDate, 'yyyy-MM-dd HH:mm', { locale: arSA })}"`
     ].join(','));
@@ -209,6 +210,7 @@ const InternApplications = () => {
                 <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الاسم الكامل</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">العمر</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الهاتف</th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">التخصص</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">البريد الإلكتروني</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الحالة</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">التاريخ</th>
@@ -227,6 +229,7 @@ const InternApplications = () => {
                   <td className="px-4 py-3 text-sm text-gray-800 font-medium">{app.fullName}</td>
                   <td className="px-4 py-3 text-sm text-gray-800">{app.age}</td>
                   <td className="px-4 py-3 text-sm text-gray-800" dir="ltr">{app.phone}</td>
+                  <td className="px-4 py-3 text-sm text-gray-800">{app.academicSpecialization}</td>
                   <td className="px-4 py-3 text-sm text-gray-800">{app.email || 'غير متوفر'}</td>
                   <td className="px-4 py-3 text-sm">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -297,7 +300,7 @@ const InternApplications = () => {
               ))}
               {filteredApplications.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                     <UserPlus className="w-10 h-10 mx-auto mb-2 opacity-40" />
                     <p className="text-sm">لا توجد طلبات مطابقة للبحث</p>
                   </td>
@@ -366,6 +369,10 @@ const InternApplications = () => {
                     <p className="text-sm text-gray-500">العنوان</p>
                     <p className="font-medium">{selectedApplication.address}</p>
                   </div>
+                  <div>
+                    <p className="text-sm text-gray-500">التخصص الدراسي</p>
+                    <p className="font-medium">{selectedApplication.academicSpecialization}</p>
+                  </div>
                 </div>
               </div>
 
@@ -405,6 +412,22 @@ const InternApplications = () => {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-700 mb-3">المهارات والخبرات</h3>
                   <p className="text-gray-800">{selectedApplication.skills}</p>
+                </div>
+              )}
+
+              {/* CV */}
+              {selectedApplication.cvUrl && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-700 mb-3">السيرة الذاتية</h3>
+                  <a 
+                    href={selectedApplication.cvUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <FileText size={18} />
+                    عرض السيرة الذاتية
+                  </a>
                 </div>
               )}
 

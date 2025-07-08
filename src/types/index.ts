@@ -128,7 +128,9 @@ export interface InternApplication {
   dateOfBirth: string;
   placeOfBirth: string;
   address: string;
+  academicSpecialization: string;
   skills?: string;
+  cvUrl?: string;
   signature: string;
   agreedToContract: boolean;
   applicationDate: Date;
