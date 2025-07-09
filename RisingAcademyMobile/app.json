@@ -13,7 +13,10 @@
       "bundleIdentifier": "com.risingacademy.mobile"
     },
     "android": {
-      "package": "com.risingacademy.mobile"
+      "package": "com.risingacademy.mobile",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {},
     "plugins": [
@@ -29,6 +32,11 @@
           "iCloudContainerEnvironment": "Production"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7ebfdb02-f0d8-4b28-8706-298ffbe58fb3"
+      }
+    }
   }
 }
