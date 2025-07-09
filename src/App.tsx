@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { auth } from './0-firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -31,6 +31,7 @@ type AppState =
 function App() {
   const [currentPage, setCurrentPage] = useState<AppState>('loading');
   const [user, setUser] = useState<User | null>(null);
+  const [navigationHistory, setNavigationHistory] = useState<AppState[]>(['loading']);
 
   useEffect(() => {
     const loadingTimer = setTimeout(() => {
@@ -57,34 +58,65 @@ function App() {
     };
   }, []);
 
+  // Handle browser back button
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault();
+      handleBack();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    
+    // Push initial state
+    window.history.pushState({ page: currentPage }, '', window.location.href);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  // Update history when page changes
+  useEffect(() => {
+    if (currentPage !== 'loading') {
+      window.history.pushState({ page: currentPage }, '', window.location.href);
+    }
+  }, [currentPage]);
+
+  const navigateToPage = useCallback((page: AppState) => {
+    setNavigationHistory(prev => [...prev, currentPage]);
+    setCurrentPage(page);
+  }, [currentPage]);
+
+  const handleBack = useCallback(() => {
+    if (navigationHistory.length > 1) {
+      const previousPage = navigationHistory[navigationHistory.length - 1];
+      setNavigationHistory(prev => prev.slice(0, -1));
+      setCurrentPage(previousPage);
+    } else {
+      setCurrentPage('choice');
+    }
+  }, [navigationHistory]);
+
   const handleChoiceSelect = (type: AppState | 'admin' | 'basic' | 'full') => {
     if (type === 'admin') {
       if (user) {
-        setCurrentPage('admin-dashboard');
+        navigateToPage('admin-dashboard');
       } else {
-        setCurrentPage('admin-login');
+        navigateToPage('admin-login');
       }
     } else if (type === 'basic' || type === 'full') {
-      setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
+      navigateToPage(type === 'basic' ? 'basic-form' : 'full-form');
     } else {
-      setCurrentPage(type as AppState);
+      navigateToPage(type as AppState);
     }
   };
 
   const handleCourseTypeSelect = (type: 'basic' | 'full') => {
-    setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
-  };
-
-  const handleBackToChoice = () => {
-    setCurrentPage('choice');
-  };
-
-  const handleBackToCourses = () => {
-    setCurrentPage('courses');
+    navigateToPage(type === 'basic' ? 'basic-form' : 'full-form');
   };
 
   const handleAdminLoginSuccess = () => {
-    setCurrentPage('admin-dashboard');
+    navigateToPage('admin-dashboard');
   };
 
   return (
@@ -116,7 +148,7 @@ function App() {
             >
               <ChoicePage 
                 onChoiceSelect={handleCourseTypeSelect} 
-                onBack={handleBackToChoice}
+                onBack={handleBack}
                 showCourseTypes={true}
               />
             </motion.div>
@@ -132,7 +164,7 @@ function App() {
             >
               <RegistrationForm 
                 type={currentPage === 'basic-form' ? 'basic' : 'full'} 
-                onBack={handleBackToCourses}
+                onBack={handleBack}
               />
             </motion.div>
           )}
@@ -145,7 +177,7 @@ function App() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <WorkshopSection onBack={handleBackToChoice} />
+              <WorkshopSection onBack={handleBack} />
             </motion.div>
           )}
 
@@ -157,7 +189,7 @@ function App() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <ClubSection onBack={handleBackToChoice} />
+              <ClubSection onBack={handleBack} />
             </motion.div>
           )}
 
@@ -169,7 +201,7 @@ function App() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <JobApplicationForm onBack={handleBackToChoice} />
+              <JobApplicationForm onBack={handleBack} />
             </motion.div>
           )}
 
@@ -181,7 +213,7 @@ function App() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <InternApplicationModal onBack={handleBackToChoice} />
+              <InternApplicationModal onBack={handleBack} />
             </motion.div>
           )}
 
@@ -194,7 +226,7 @@ function App() {
               transition={{ duration: 0.5 }}
             >
               <AdminLogin 
-                onBack={handleBackToChoice}
+                onBack={handleBack}
                 onLoginSuccess={handleAdminLoginSuccess}
               />
             </motion.div>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, ActivityIndicator, BackHandler } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './firebase.config';
@@ -31,6 +31,7 @@ type AppState =
 export default function App() {
   const [currentPage, setCurrentPage] = useState<AppState>('loading');
   const [user, setUser] = useState<User | null>(null);
+  const [navigationHistory, setNavigationHistory] = useState<AppState[]>(['loading']);
 
   useEffect(() => {
     const loadingTimer = setTimeout(() => {
@@ -57,34 +58,53 @@ export default function App() {
     };
   }, []);
 
+  // Handle Android back button
+  useEffect(() => {
+    const backAction = () => {
+      handleBack();
+      return true; // Prevent default behavior
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, [navigationHistory]);
+
+  const navigateToPage = useCallback((page: AppState) => {
+    setNavigationHistory(prev => [...prev, currentPage]);
+    setCurrentPage(page);
+  }, [currentPage]);
+
+  const handleBack = useCallback(() => {
+    if (navigationHistory.length > 1) {
+      const previousPage = navigationHistory[navigationHistory.length - 1];
+      setNavigationHistory(prev => prev.slice(0, -1));
+      setCurrentPage(previousPage);
+    } else {
+      setCurrentPage('choice');
+    }
+  }, [navigationHistory]);
+
   const handleChoiceSelect = (type: AppState | 'admin' | 'basic' | 'full') => {
     if (type === 'admin') {
       if (user) {
-        setCurrentPage('admin-dashboard');
+        navigateToPage('admin-dashboard');
       } else {
-        setCurrentPage('admin-login');
+        navigateToPage('admin-login');
       }
     } else if (type === 'basic' || type === 'full') {
-      setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
+      navigateToPage(type === 'basic' ? 'basic-form' : 'full-form');
     } else {
-      setCurrentPage(type as AppState);
+      navigateToPage(type as AppState);
     }
   };
 
   const handleCourseTypeSelect = (type: 'basic' | 'full') => {
-    setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
-  };
-
-  const handleBackToChoice = () => {
-    setCurrentPage('choice');
-  };
-
-  const handleBackToCourses = () => {
-    setCurrentPage('courses');
+    navigateToPage(type === 'basic' ? 'basic-form' : 'full-form');
   };
 
   const handleAdminLoginSuccess = () => {
-    setCurrentPage('admin-dashboard');
+    navigateToPage('admin-dashboard');
   };
 
   const renderCurrentPage = () => {
@@ -97,7 +117,7 @@ export default function App() {
         return (
           <ChoicePage 
             onChoiceSelect={handleCourseTypeSelect} 
-            onBack={handleBackToChoice}
+            onBack={handleBack}
             showCourseTypes={true}
           />
         );
@@ -106,26 +126,26 @@ export default function App() {
         return (
           <RegistrationForm 
             type={currentPage === 'basic-form' ? 'basic' : 'full'} 
-            onBack={handleBackToCourses}
+            onBack={handleBack}
           />
         );
       case 'workshops':
-        return <WorkshopSection onBack={handleBackToChoice} />;
+        return <WorkshopSection onBack={handleBack} />;
       case 'clubs':
-        return <ClubSection onBack={handleBackToChoice} />;
+        return <ClubSection onBack={handleBack} />;
       case 'jobs':
-        return <JobApplicationForm onBack={handleBackToChoice} />;
+        return <JobApplicationForm onBack={handleBack} />;
       case 'internapplication':
-        return <InternApplicationForm onBack={handleBackToChoice} />;
+        return <InternApplicationForm onBack={handleBack} />;
       case 'admin-login':
         return (
           <AdminLogin 
-            onBack={handleBackToChoice}
+            onBack={handleBack}
             onLoginSuccess={handleAdminLoginSuccess}
           />
         );
       case 'admin-dashboard':
-        return user ? <AdminDashboard /> : <LoadingScreen />;
+        return user ? <AdminDashboard onBack={handleBack} /> : <LoadingScreen />;
       default:
         return <LoadingScreen />;
     }

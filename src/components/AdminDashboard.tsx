@@ -19,7 +19,9 @@ import {
   UserCheck,
   Briefcase,
   Award,
-  User
+  User,
+  BarChart3,
+  PieChart
 } from 'lucide-react';
 
 import { 
@@ -47,6 +49,7 @@ import ClubManagement from './ClubManagement';
 import ClubApplications from './ClubApplications';
 import JobApplications from './JobApplications';
 import InternApplications from './InternApplications';
+import StatisticsPanel from './StatisticsPanel';
 
 const AdminDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -56,7 +59,7 @@ const AdminDashboard = () => {
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'applications' | 'workshops' | 'workshop-applications' | 'clubs' | 'club-applications' | 'job-applications' | 'intern-applications'>('applications');
+  const [activeTab, setActiveTab] = useState<'applications' | 'workshops' | 'workshop-applications' | 'clubs' | 'club-applications' | 'job-applications' | 'intern-applications' | 'statistics'>('applications');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const formatDate = (date: Date) => {
@@ -255,7 +258,7 @@ const AdminDashboard = () => {
 
       {/* Navigation Tabs */}
       <div className="bg-white rounded-2xl p-2 mb-6 shadow-md">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -268,6 +271,19 @@ const AdminDashboard = () => {
           >
             <FileText size={16} />
             طلبات الدورات
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('statistics')}
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${
+              activeTab === 'statistics'
+                ? 'bg-[#22b0fc] text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <BarChart3 size={16} />
+            الإحصائيات
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -353,6 +369,8 @@ const AdminDashboard = () => {
       {/* Content based on active tab */}
       {activeTab === 'workshops' ? (
         <WorkshopManagement />
+      ) : activeTab === 'statistics' ? (
+        <StatisticsPanel />
       ) : activeTab === 'intern-applications' ? (
         <InternApplications />
       ) : activeTab === 'workshop-applications' ? (

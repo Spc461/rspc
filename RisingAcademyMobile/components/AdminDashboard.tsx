@@ -1,18 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
   StyleSheet, 
   ScrollView, 
   TouchableOpacity,
-  Alert 
+  Alert,
+  Dimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase.config';
+import { auth, db } from '../firebase.config';
+import { 
+  collection, 
+  query, 
+  orderBy, 
+  onSnapshot,
+  updateDoc,
+  deleteDoc,
+  doc
+} from 'firebase/firestore';
+import { Application } from '../types';
+import AdminApplications from './AdminApplications';
+import AdminStatistics from './AdminStatistics';
 
-const AdminDashboard = () => {
+const { width } = Dimensions.get('window');
+
+interface AdminDashboardProps {
+  onBack: () => void;
+}
+
+const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
+  const [activeTab, setActiveTab] = useState<'applications' | 'statistics'>('applications');
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, 'applications'), orderBy('submissionDate', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const apps: Application[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        apps.push({ 
+          id: doc.id, 
+          ...data,
+          status: data.status || 'pending',
+          submissionDate: data.submissionDate?.toDate() 
+        } as Application);
+      });
+      setApplications(apps);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleLogout = async () => {
     Alert.alert(
       'تسجيل الخروج',
@@ -25,6 +69,7 @@ const AdminDashboard = () => {
           onPress: async () => {
             try {
               await signOut(auth);
+              onBack();
             } catch (error) {
               console.error('Error signing out:', error);
             }
@@ -33,6 +78,14 @@ const AdminDashboard = () => {
       ]
     );
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>جاري تحميل البيانات...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -46,53 +99,55 @@ const AdminDashboard = () => {
             <Text style={styles.headerTitle}>لوحة التحكم الإدارية</Text>
             <Text style={styles.headerSubtitle}>إدارة جميع طلبات التسجيل والخدمات</Text>
           </View>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-            <Text style={styles.logoutButtonText}>خروج</Text>
-          </TouchableOpacity>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity style={styles.backButton} onPress={onBack}>
+              <Ionicons name="arrow-back" size={20} color="#6b7280" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Ionicons name="log-out-outline" size={20} color="#ef4444" />
+              <Text style={styles.logoutButtonText}>خروج</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </LinearGradient>
 
-      {/* Dashboard Message */}
-      <View style={styles.dashboardMessage}>
-        <LinearGradient
-          colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.9)']}
-          style={styles.messageCard}
+      {/* Navigation Tabs */}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'applications' && styles.activeTab]}
+          onPress={() => setActiveTab('applications')}
         >
-          <Ionicons name="information-circle" size={48} color="#22b0fc" />
-          <Text style={styles.messageTitle}>لوحة التحكم الإدارية</Text>
-          <Text style={styles.messageText}>
-            للوصول إلى جميع ميزات الإدارة والتحكم الكامل في النظام، يرجى استخدام الموقع الإلكتروني على الحاسوب أو المتصفح.
+          <Ionicons 
+            name="document-text-outline" 
+            size={20} 
+            color={activeTab === 'applications' ? '#ffffff' : '#6b7280'} 
+          />
+          <Text style={[styles.tabText, activeTab === 'applications' && styles.activeTabText]}>
+            الطلبات
           </Text>
-          <Text style={styles.messageSubtext}>
-            تطبيق الهاتف مخصص للطلاب والمستخدمين العاديين فقط.
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'statistics' && styles.activeTab]}
+          onPress={() => setActiveTab('statistics')}
+        >
+          <Ionicons 
+            name="bar-chart-outline" 
+            size={20} 
+            color={activeTab === 'statistics' ? '#ffffff' : '#6b7280'} 
+          />
+          <Text style={[styles.tabText, activeTab === 'statistics' && styles.activeTabText]}>
+            الإحصائيات
           </Text>
-        </LinearGradient>
+        </TouchableOpacity>
       </View>
 
-      {/* Quick Stats */}
-      <View style={styles.quickStats}>
-        <Text style={styles.sectionTitle}>إحصائيات سريعة</Text>
-        <View style={styles.statsGrid}>
-          {[
-            { title: 'طلبات الدورات', icon: 'school-outline', color: '#22b0fc' },
-            { title: 'تسجيلات الورش', icon: 'calendar-outline', color: '#f59e0b' },
-            { title: 'طلبات النوادي', icon: 'people-outline', color: '#8b5cf6' },
-            { title: 'طلبات التوظيف', icon: 'briefcase-outline', color: '#10b981' },
-          ].map((stat, index) => (
-            <View key={index} style={styles.statCard}>
-              <LinearGradient
-                colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.9)']}
-                style={styles.statCardGradient}
-              >
-                <Ionicons name={stat.icon as any} size={24} color={stat.color} />
-                <Text style={styles.statTitle}>{stat.title}</Text>
-                <Text style={styles.statNote}>متاح على الموقع</Text>
-              </LinearGradient>
-            </View>
-          ))}
-        </View>
-      </View>
+      {/* Content */}
+      {activeTab === 'applications' ? (
+        <AdminApplications applications={applications} />
+      ) : (
+        <AdminStatistics />
+      )}
     </ScrollView>
   );
 };
@@ -103,6 +158,15 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#ffffff',
+    fontSize: 16,
   },
   header: {
     borderRadius: 16,
@@ -132,6 +196,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
   },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  backButton: {
+    padding: 8,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 8,
+  },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -146,31 +219,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  dashboardMessage: {
-    marginBottom: 32,
+  tabsContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 24,
   },
-  messageCard: {
-    borderRadius: 16,
-    padding: 32,
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 8,
   },
-  messageTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginTop: 16,
-    marginBottom: 16,
-    textAlign: 'center',
+  activeTab: {
+    backgroundColor: '#22b0fc',
   },
-  messageText: {
+  tabText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  activeTabText: {
+    color: '#ffffff',
+  },
+});
+
+export default AdminDashboard;
+
     fontSize: 16,
     color: '#4b5563',
     textAlign: 'center',
