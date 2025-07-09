@@ -145,7 +145,7 @@ const WorkshopSection = ({ onBack }: WorkshopSectionProps) => {
                 <Image
                   source={{ uri: workshop.imageUrl }}
                   style={styles.workshopImage}
-                  defaultSource={require('../assets/placeholder.png')}
+               //   defaultSource={require('../assets/placeholder.png')}
                 />
                 
                 <View style={styles.cardContent}>
