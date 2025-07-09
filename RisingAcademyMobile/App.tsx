@@ -153,12 +153,9 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#1e3a8a', '#22b0fc', '#4338ca']}
-        style={styles.gradient}
-      >
+      <View style={styles.background}>
         {renderCurrentPage()}
-      </LinearGradient>
+      </View>
       <StatusBar style="light" />
     </View>
   );
@@ -168,7 +165,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  gradient: {
+  background: {
     flex: 1,
+    backgroundColor: '#ffffff',
   },
 });

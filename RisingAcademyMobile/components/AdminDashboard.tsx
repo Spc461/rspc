@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,16 +6,86 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Dimensions
+  Dimensions,
+  BackHandler
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase.config';
+import { auth, db } from '../firebase.config';
+import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import AdminApplications from './AdminApplications';
 
 const { width } = Dimensions.get('window');
 
-const AdminDashboard = () => {
+interface AdminDashboardProps {
+  onBack: () => void;
+}
+
+const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [stats, setStats] = useState({
+    applications: 0,
+    workshops: 0,
+    clubs: 0,
+    jobs: 0,
+    interns: 0
+  });
+
+  useEffect(() => {
+    // Load statistics
+    const unsubscribes: (() => void)[] = [];
+
+    // Applications
+    const applicationsQuery = query(collection(db, 'applications'), orderBy('submissionDate', 'desc'));
+    unsubscribes.push(onSnapshot(applicationsQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, applications: snapshot.size }));
+    }));
+
+    // Workshop registrations
+    const workshopsQuery = query(collection(db, 'workshopRegistrations'));
+    unsubscribes.push(onSnapshot(workshopsQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, workshops: snapshot.size }));
+    }));
+
+    // Club applications
+    const clubsQuery = query(collection(db, 'clubApplications'));
+    unsubscribes.push(onSnapshot(clubsQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, clubs: snapshot.size }));
+    }));
+
+    // Job applications
+    const jobsQuery = query(collection(db, 'jobApplications'));
+    unsubscribes.push(onSnapshot(jobsQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, jobs: snapshot.size }));
+    }));
+
+    // Intern applications
+    const internsQuery = query(collection(db, 'internApplications'));
+    unsubscribes.push(onSnapshot(internsQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, interns: snapshot.size }));
+    }));
+
+    return () => {
+      unsubscribes.forEach(unsubscribe => unsubscribe());
+    };
+  }, []);
+
+  // Handle Android back button
+  useEffect(() => {
+    const backAction = () => {
+      if (activeTab !== 'dashboard') {
+        setActiveTab('dashboard');
+        return true;
+      }
+      onBack();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => backHandler.remove();
+  }, [activeTab, onBack]);
+
   const handleLogout = async () => {
     Alert.alert(
       'تسجيل الخروج',
@@ -28,6 +98,7 @@ const AdminDashboard = () => {
           onPress: async () => {
             try {
               await signOut(auth);
+              onBack();
             } catch (error) {
               console.error('Error signing out:', error);
             }
@@ -37,11 +108,11 @@ const AdminDashboard = () => {
     );
   };
 
-  return (
+  const renderDashboard = () => (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
       <LinearGradient
-        colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.9)']}
+        colors={['rgba(34, 176, 252, 0.1)', 'rgba(34, 176, 252, 0.05)']}
         style={styles.header}
       >
         <View style={styles.headerContent}>
@@ -56,21 +127,21 @@ const AdminDashboard = () => {
         </View>
       </LinearGradient>
 
-      {/* Dashboard Message */}
-      <View style={styles.dashboardMessage}>
-        <LinearGradient
-          colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.9)']}
-          style={styles.messageCard}
-        >
-          <Ionicons name="information-circle" size={48} color="#22b0fc" />
-          <Text style={styles.messageTitle}>لوحة التحكم الإدارية</Text>
-          <Text style={styles.messageText}>
-            للوصول إلى جميع ميزات الإدارة والتحكم الكامل في النظام، يرجى استخدام الموقع الإلكتروني على الحاسوب أو المتصفح.
-          </Text>
-          <Text style={styles.messageSubtext}>
-            تطبيق الهاتف مخصص للطلاب والمستخدمين العاديين فقط.
-          </Text>
-        </LinearGradient>
+      {/* Navigation Tabs */}
+      <View style={styles.tabsContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.tabsRow}>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'applications' && styles.activeTab]}
+              onPress={() => setActiveTab('applications')}
+            >
+              <Ionicons name="document-text" size={20} color={activeTab === 'applications' ? '#ffffff' : '#6b7280'} />
+              <Text style={[styles.tabText, activeTab === 'applications' && styles.activeTabText]}>
+                طلبات الدورات
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
 
       {/* Quick Stats */}
@@ -78,31 +149,52 @@ const AdminDashboard = () => {
         <Text style={styles.sectionTitle}>إحصائيات سريعة</Text>
         <View style={styles.statsGrid}>
           {[
-            { title: 'طلبات الدورات', icon: 'school-outline', color: '#22b0fc' },
-            { title: 'تسجيلات الورش', icon: 'calendar-outline', color: '#f59e0b' },
-            { title: 'طلبات النوادي', icon: 'people-outline', color: '#8b5cf6' },
-            { title: 'طلبات التوظيف', icon: 'briefcase-outline', color: '#10b981' },
+            { title: 'طلبات الدورات', value: stats.applications, icon: 'school-outline', color: '#22b0fc' },
+            { title: 'تسجيلات الورش', value: stats.workshops, icon: 'calendar-outline', color: '#f59e0b' },
+            { title: 'طلبات النوادي', value: stats.clubs, icon: 'people-outline', color: '#8b5cf6' },
+            { title: 'طلبات التوظيف', value: stats.jobs, icon: 'briefcase-outline', color: '#10b981' },
+            { title: 'طلبات التدريب', value: stats.interns, icon: 'person-add-outline', color: '#6366f1' },
           ].map((stat, index) => (
             <View key={index} style={styles.statCard}>
-              <LinearGradient
-                colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.9)']}
-                style={styles.statCardGradient}
-              >
+              <View style={styles.statCardContent}>
                 <Ionicons name={stat.icon as any} size={24} color={stat.color} />
                 <Text style={styles.statTitle}>{stat.title}</Text>
-                <Text style={styles.statNote}>متاح على الموقع</Text>
-              </LinearGradient>
+                <Text style={[styles.statValue, { color: stat.color }]}>{stat.value}</Text>
+              </View>
             </View>
           ))}
         </View>
       </View>
+
+      {/* Info Message */}
+      <View style={styles.infoMessage}>
+        <View style={styles.infoCard}>
+          <Ionicons name="information-circle" size={32} color="#22b0fc" />
+          <Text style={styles.infoTitle}>لوحة التحكم المحمولة</Text>
+          <Text style={styles.infoText}>
+            يمكنك الآن إدارة طلبات التسجيل مباشرة من هاتفك المحمول. اضغط على "طلبات الدورات" أعلاه للبدء.
+          </Text>
+        </View>
+      </View>
     </ScrollView>
+  );
+
+  return (
+    <View style={styles.mainContainer}>
+      {activeTab === 'dashboard' ? renderDashboard() : null}
+      {activeTab === 'applications' ? <AdminApplications /> : null}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
   },
   contentContainer: {
     padding: 16,
@@ -113,9 +205,9 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 4,
   },
   headerContent: {
     flexDirection: 'row',
@@ -146,39 +238,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  dashboardMessage: {
-    marginBottom: 32,
+  tabsContainer: {
+    marginBottom: 24,
   },
-  messageCard: {
-    borderRadius: 16,
-    padding: 32,
+  tabsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 16,
+  },
+  tab: {
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
   },
-  messageTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginTop: 16,
-    marginBottom: 16,
-    textAlign: 'center',
+  activeTab: {
+    backgroundColor: '#22b0fc',
   },
-  messageText: {
-    fontSize: 16,
-    color: '#4b5563',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 12,
-  },
-  messageSubtext: {
+  tabText: {
     fontSize: 14,
+    fontWeight: '600',
     color: '#6b7280',
-    textAlign: 'center',
-    fontStyle: 'italic',
+  },
+  activeTabText: {
+    color: '#ffffff',
   },
   quickStats: {
     marginBottom: 24,
@@ -198,32 +284,57 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '48%',
+    backgroundColor: '#f9fafb',
     borderRadius: 12,
-    overflow: 'hidden',
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 2,
   },
-  statCardGradient: {
-    padding: 16,
+  statCardContent: {
     alignItems: 'center',
-    minHeight: 100,
+    minHeight: 80,
     justifyContent: 'center',
   },
   statTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: '#1f2937',
     textAlign: 'center',
     marginTop: 8,
     marginBottom: 4,
   },
-  statNote: {
-    fontSize: 12,
-    color: '#6b7280',
+  statValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
     textAlign: 'center',
+  },
+  infoMessage: {
+    marginBottom: 24,
+  },
+  infoCard: {
+    backgroundColor: '#f0f9ff',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0f2fe',
+  },
+  infoTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginTop: 12,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#4b5563',
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });
 
