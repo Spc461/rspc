@@ -7,7 +7,8 @@ import {
   XCircle,
   Trash2,
   User,
-  UserPlus
+  UserPlus,
+  FileText
 } from 'lucide-react';
 import {
   collection,

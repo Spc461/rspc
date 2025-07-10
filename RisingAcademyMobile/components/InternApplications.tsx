@@ -7,47 +7,48 @@ import {
   TouchableOpacity,
   Alert,
   TextInput,
-  ScrollView
+  ScrollView,
+  Modal
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase.config';
 
-interface Application {
+interface InternApplication {
   id: string;
   fullName: string;
+  age: number;
   phone: string;
   email?: string;
-  course: string;
-  registrationType: 'Basic' | 'Full';
+  dateOfBirth: string;
+  placeOfBirth: string;
+  address: string;
+  academicSpecialization: string;
+  skills: string;
+  applicationDate: any;
   status: 'pending' | 'approved' | 'rejected';
-  submissionDate: any;
-  age: number;
-  wilaya: string;
-  education: string;
 }
 
-export default function AdminApplications() {
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [filteredApplications, setFilteredApplications] = useState<Application[]>([]);
+export default function InternApplications() {
+  const [applications, setApplications] = useState<InternApplication[]>([]);
+  const [filteredApplications, setFilteredApplications] = useState<InternApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
-  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<InternApplication | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    const q = query(collection(db, 'applications'), orderBy('submissionDate', 'desc'));
+    const q = query(collection(db, 'internApplications'), orderBy('applicationDate', 'desc'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const apps: Application[] = [];
+      const apps: InternApplication[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        apps.push({ 
-          id: doc.id, 
+        apps.push({
+          id: doc.id,
           ...data,
-          status: data.status || 'pending',
-          submissionDate: data.submissionDate?.toDate() 
-        } as Application);
+          applicationDate: data.applicationDate?.toDate()
+        } as InternApplication);
       });
       setApplications(apps);
       setLoading(false);
@@ -59,10 +60,6 @@ export default function AdminApplications() {
   useEffect(() => {
     let result = applications;
     
-    if (filter !== 'all') {
-      result = result.filter(app => app.status === filter);
-    }
-    
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(app => 
@@ -73,27 +70,18 @@ export default function AdminApplications() {
     }
     
     setFilteredApplications(result);
-  }, [applications, filter, searchTerm]);
+  }, [applications, searchTerm]);
 
-  const approveApplication = async (id: string) => {
+  const handleStatusChange = async (appId: string, newStatus: 'pending' | 'approved' | 'rejected') => {
     try {
-      await updateDoc(doc(db, 'applications', id), { status: 'approved' });
-      Alert.alert('نجح', 'تم قبول الطلب بنجاح');
+      await updateDoc(doc(db, 'internApplications', appId), { status: newStatus });
+      Alert.alert('نجح', 'تم تحديث حالة الطلب بنجاح');
     } catch (error) {
-      Alert.alert('خطأ', 'حدث خطأ أثناء قبول الطلب');
+      Alert.alert('خطأ', 'حدث خطأ أثناء تحديث الحالة');
     }
   };
 
-  const rejectApplication = async (id: string) => {
-    try {
-      await updateDoc(doc(db, 'applications', id), { status: 'rejected' });
-      Alert.alert('نجح', 'تم رفض الطلب');
-    } catch (error) {
-      Alert.alert('خطأ', 'حدث خطأ أثناء رفض الطلب');
-    }
-  };
-
-  const deleteApplication = async (id: string) => {
+  const handleDelete = async (appId: string) => {
     Alert.alert('تأكيد الحذف', 'هل أنت متأكد من حذف هذا الطلب؟', [
       { text: 'إلغاء', style: 'cancel' },
       {
@@ -101,7 +89,7 @@ export default function AdminApplications() {
         style: 'destructive',
         onPress: async () => {
           try {
-            await deleteDoc(doc(db, 'applications', id));
+            await deleteDoc(doc(db, 'internApplications', appId));
             Alert.alert('نجح', 'تم حذف الطلب بنجاح');
           } catch (error) {
             Alert.alert('خطأ', 'حدث خطأ أثناء حذف الطلب');
@@ -111,7 +99,17 @@ export default function AdminApplications() {
     ]);
   };
 
-  const renderApplicationItem = ({ item }: { item: Application }) => (
+  const openModal = (application: InternApplication) => {
+    setSelectedApplication(application);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setSelectedApplication(null);
+    setModalVisible(false);
+  };
+
+  const renderApplicationItem = ({ item }: { item: InternApplication }) => (
     <View style={styles.applicationCard}>
       <LinearGradient
         colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.9)']}
@@ -131,26 +129,24 @@ export default function AdminApplications() {
         </View>
         
         <View style={styles.cardContent}>
-          <Text style={styles.courseText}>{item.course}</Text>
-          <Text style={styles.typeText}>
-            {item.registrationType === 'Basic' ? 'تسجيل أولي' : 'تسجيل كامل'}
-          </Text>
+          <Text style={styles.specializationText}>{item.academicSpecialization}</Text>
+          <Text style={styles.ageText}>العمر: {item.age}</Text>
           <Text style={styles.phoneText}>{item.phone}</Text>
         </View>
 
         <View style={styles.actionButtons}>
           <TouchableOpacity 
             style={styles.viewButton}
-            onPress={() => setSelectedApplication(item)}
+            onPress={() => openModal(item)}
           >
-            <Ionicons name="eye" size={16} color="#22b0fc" />
+            <Ionicons name="eye" size={16} color="#6366f1" />
             <Text style={styles.viewButtonText}>عرض</Text>
           </TouchableOpacity>
           
           {item.status !== 'approved' && (
             <TouchableOpacity 
               style={styles.approveButton}
-              onPress={() => approveApplication(item.id)}
+              onPress={() => handleStatusChange(item.id, 'approved')}
             >
               <Ionicons name="checkmark-circle" size={16} color="#10b981" />
               <Text style={styles.approveButtonText}>قبول</Text>
@@ -160,7 +156,7 @@ export default function AdminApplications() {
           {item.status !== 'rejected' && (
             <TouchableOpacity 
               style={styles.rejectButton}
-              onPress={() => rejectApplication(item.id)}
+              onPress={() => handleStatusChange(item.id, 'rejected')}
             >
               <Ionicons name="close-circle" size={16} color="#ef4444" />
               <Text style={styles.rejectButtonText}>رفض</Text>
@@ -169,7 +165,7 @@ export default function AdminApplications() {
           
           <TouchableOpacity 
             style={styles.deleteButton}
-            onPress={() => deleteApplication(item.id)}
+            onPress={() => handleDelete(item.id)}
           >
             <Ionicons name="trash" size={16} color="#ef4444" />
           </TouchableOpacity>
@@ -181,16 +177,16 @@ export default function AdminApplications() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>جاري تحميل الطلبات...</Text>
+        <Text style={styles.loadingText}>جاري تحميل طلبات التدريب...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>طلبات التسجيل</Text>
+      <Text style={styles.title}>طلبات التدريب</Text>
       
-      {/* Search and Filter */}
+      {/* Search */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -200,25 +196,6 @@ export default function AdminApplications() {
         />
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-        {[
-          { key: 'all', label: 'الكل' },
-          { key: 'pending', label: 'قيد المراجعة' },
-          { key: 'approved', label: 'مقبولة' },
-          { key: 'rejected', label: 'مرفوضة' },
-        ].map((filterOption) => (
-          <TouchableOpacity
-            key={filterOption.key}
-            style={[styles.filterButton, filter === filterOption.key && styles.activeFilter]}
-            onPress={() => setFilter(filterOption.key as any)}
-          >
-            <Text style={[styles.filterText, filter === filterOption.key && styles.activeFilterText]}>
-              {filterOption.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
       <FlatList
         data={filteredApplications}
         keyExtractor={(item) => item.id}
@@ -227,63 +204,93 @@ export default function AdminApplications() {
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>لا توجد طلبات</Text>
+            <Text style={styles.emptyText}>لا توجد طلبات تدريب</Text>
           </View>
         }
       />
 
       {/* Application Details Modal */}
-      {selectedApplication && (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>تفاصيل الطلب</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.modalTitle}>تفاصيل طلب التدريب</Text>
               
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>الاسم:</Text>
-                <Text style={styles.detailValue}>{selectedApplication.fullName}</Text>
-              </View>
-              
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>العمر:</Text>
-                <Text style={styles.detailValue}>{selectedApplication.age}</Text>
-              </View>
-              
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>الهاتف:</Text>
-                <Text style={styles.detailValue}>{selectedApplication.phone}</Text>
-              </View>
-              
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>البريد الإلكتروني:</Text>
-                <Text style={styles.detailValue}>{selectedApplication.email || 'غير متوفر'}</Text>
-              </View>
-              
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>الدورة:</Text>
-                <Text style={styles.detailValue}>{selectedApplication.course}</Text>
-              </View>
-              
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>الولاية:</Text>
-                <Text style={styles.detailValue}>{selectedApplication.wilaya}</Text>
-              </View>
-              
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>المستوى التعليمي:</Text>
-                <Text style={styles.detailValue}>{selectedApplication.education}</Text>
-              </View>
+              {selectedApplication && (
+                <>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>الاسم:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.fullName}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>العمر:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.age} سنة</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>الهاتف:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.phone}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>البريد الإلكتروني:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.email || 'غير متوفر'}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>تاريخ الميلاد:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.dateOfBirth}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>مكان الميلاد:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.placeOfBirth}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>العنوان:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.address}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>التخصص الدراسي:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.academicSpecialization}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>المهارات:</Text>
+                    <Text style={styles.detailValue}>{selectedApplication.skills}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>الحالة:</Text>
+                    <Text style={[styles.detailValue, 
+                      selectedApplication.status === 'approved' ? styles.approvedText :
+                      selectedApplication.status === 'rejected' ? styles.rejectedText : styles.pendingText
+                    ]}>
+                      {selectedApplication.status === 'pending' ? 'قيد المراجعة' : 
+                       selectedApplication.status === 'approved' ? 'مقبول' : 'مرفوض'}
+                    </Text>
+                  </View>
+                </>
+              )}
             </ScrollView>
             
             <TouchableOpacity 
               style={styles.closeButton}
-              onPress={() => setSelectedApplication(null)}
+              onPress={closeModal}
             >
               <Text style={styles.closeButtonText}>إغلاق</Text>
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      </Modal>
     </View>
   );
 }
@@ -321,29 +328,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#e5e7eb',
-  },
-  filterContainer: {
-    marginBottom: 16,
-  },
-  filterButton: {
-    backgroundColor: '#f9fafb',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-  },
-  activeFilter: {
-    backgroundColor: '#22b0fc',
-    borderColor: '#22b0fc',
-  },
-  filterText: {
-    fontSize: 14,
-    color: '#6b7280',
-  },
-  activeFilterText: {
-    color: '#ffffff',
   },
   listContainer: {
     paddingBottom: 20,
@@ -395,13 +379,13 @@ const styles = StyleSheet.create({
   cardContent: {
     marginBottom: 16,
   },
-  courseText: {
+  specializationText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#374151',
     marginBottom: 4,
   },
-  typeText: {
+  ageText: {
     fontSize: 14,
     color: '#6b7280',
     marginBottom: 4,
@@ -418,14 +402,14 @@ const styles = StyleSheet.create({
   viewButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#eef2ff',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     gap: 4,
   },
   viewButtonText: {
-    color: '#22b0fc',
+    color: '#6366f1',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -476,11 +460,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -491,6 +471,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     maxHeight: '80%',
+    width: '90%',
   },
   modalTitle: {
     fontSize: 20,
@@ -502,20 +483,35 @@ const styles = StyleSheet.create({
   detailRow: {
     flexDirection: 'row',
     marginBottom: 12,
+    alignItems: 'flex-start',
   },
   detailLabel: {
     fontSize: 14,
     fontWeight: '600',
     color: '#374151',
     width: 100,
+    marginRight: 8,
   },
   detailValue: {
     fontSize: 14,
     color: '#6b7280',
     flex: 1,
+    textAlign: 'left',
+  },
+  approvedText: {
+    color: '#10b981',
+    fontWeight: '600',
+  },
+  rejectedText: {
+    color: '#ef4444',
+    fontWeight: '600',
+  },
+  pendingText: {
+    color: '#f59e0b',
+    fontWeight: '600',
   },
   closeButton: {
-    backgroundColor: '#22b0fc',
+    backgroundColor: '#6366f1',
     paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,

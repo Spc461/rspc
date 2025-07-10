@@ -15,6 +15,7 @@ import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase.config';
 import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
 import AdminApplications from './AdminApplications';
+import InternApplications from './InternApplications';
 
 const { width } = Dimensions.get('window');
 
@@ -140,6 +141,16 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                 طلبات الدورات
               </Text>
             </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'interns' && styles.activeTab]}
+              onPress={() => setActiveTab('interns')}
+            >
+              <Ionicons name="person-add-outline" size={20} color={activeTab === 'interns' ? '#ffffff' : '#6b7280'} />
+              <Text style={[styles.tabText, activeTab === 'interns' && styles.activeTabText]}>
+                طلبات التدريب
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -183,6 +194,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     <View style={styles.mainContainer}>
       {activeTab === 'dashboard' ? renderDashboard() : null}
       {activeTab === 'applications' ? <AdminApplications /> : null}
+      {activeTab === 'interns' ? <InternApplications /> : null}
     </View>
   );
 };

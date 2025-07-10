@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, ActivityIndicator, BackHandler } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase.config';
 
 import LoadingScreen from './components/LoadingScreen';
 import ChoicePage from './components/ChoicePage';
 import RegistrationForm from './components/RegistrationForm';
+import AdminLogin from './components/AdminLogin';
+import AdminDashboard from './components/AdminDashboard';
 import WorkshopSection from './components/WorkshopSection';
 import ClubSection from './components/ClubSection';
 import JobApplicationForm from './components/JobApplicationForm';
-import InternApplicationForm from './components/InternApplicationForm';
-import AdminLogin from './components/AdminLogin';
-import AdminDashboard from './components/AdminDashboard';
+import InternApplicationModal from './components/InternApplicationModal';
 
 type AppState = 
   | 'loading' 
@@ -28,10 +28,11 @@ type AppState =
   | 'admin-login' 
   | 'admin-dashboard';
 
+const { width, height } = Dimensions.get('window');
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState<AppState>('loading');
-  const [user, setUser] = useState<User | null>(null);
-  const [navigationHistory, setNavigationHistory] = useState<AppState[]>(['loading']);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const loadingTimer = setTimeout(() => {
@@ -40,71 +41,44 @@ export default function App() {
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
-
-      setCurrentPage((prevPage) => {
-        if (firebaseUser && prevPage === 'admin-login') {
-          return 'admin-dashboard';
-        }
-        if (!firebaseUser && prevPage === 'admin-dashboard') {
-          return 'choice';
-        }
-        return prevPage;
-      });
+      if (firebaseUser && currentPage === 'admin-login') {
+        setCurrentPage('admin-dashboard');
+      }
+      if (!firebaseUser && currentPage === 'admin-dashboard') {
+        setCurrentPage('choice');
+      }
     });
 
     return () => {
       clearTimeout(loadingTimer);
       unsubscribe();
     };
-  }, []);
-
-  // Handle Android back button
-  useEffect(() => {
-    const backAction = () => {
-      handleBack();
-      return true; // Prevent default behavior
-    };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-    return () => backHandler.remove();
-  }, [navigationHistory]);
-
-  const navigateToPage = useCallback((page: AppState) => {
-    setNavigationHistory(prev => [...prev, currentPage]);
-    setCurrentPage(page);
   }, [currentPage]);
-
-  const handleBack = useCallback(() => {
-    if (navigationHistory.length > 1) {
-      const previousPage = navigationHistory[navigationHistory.length - 1];
-      setNavigationHistory(prev => prev.slice(0, -1));
-      setCurrentPage(previousPage);
-    } else {
-      setCurrentPage('choice');
-    }
-  }, [navigationHistory]);
 
   const handleChoiceSelect = (type: AppState | 'admin' | 'basic' | 'full') => {
     if (type === 'admin') {
       if (user) {
-        navigateToPage('admin-dashboard');
+        setCurrentPage('admin-dashboard');
       } else {
-        navigateToPage('admin-login');
+        setCurrentPage('admin-login');
       }
     } else if (type === 'basic' || type === 'full') {
-      navigateToPage(type === 'basic' ? 'basic-form' : 'full-form');
+      setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
     } else {
-      navigateToPage(type as AppState);
+      setCurrentPage(type as AppState);
     }
   };
 
   const handleCourseTypeSelect = (type: 'basic' | 'full') => {
-    navigateToPage(type === 'basic' ? 'basic-form' : 'full-form');
+    setCurrentPage(type === 'basic' ? 'basic-form' : 'full-form');
+  };
+
+  const handleBack = () => {
+    setCurrentPage('choice');
   };
 
   const handleAdminLoginSuccess = () => {
-    navigateToPage('admin-dashboard');
+    setCurrentPage('admin-dashboard');
   };
 
   const renderCurrentPage = () => {
@@ -136,7 +110,7 @@ export default function App() {
       case 'jobs':
         return <JobApplicationForm onBack={handleBack} />;
       case 'internapplication':
-        return <InternApplicationForm onBack={handleBack} />;
+        return <InternApplicationModal onBack={handleBack} />;
       case 'admin-login':
         return (
           <AdminLogin 
@@ -145,18 +119,21 @@ export default function App() {
           />
         );
       case 'admin-dashboard':
-        return user ? <AdminDashboard onBack={handleBack} /> : <LoadingScreen />;
+        return user ? <AdminDashboard /> : <ChoicePage onChoiceSelect={handleChoiceSelect} />;
       default:
-        return <LoadingScreen />;
+        return <ChoicePage onChoiceSelect={handleChoiceSelect} />;
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.background}>
+      <LinearGradient
+        colors={['#ffffff', '#f8fafc', '#ffffff']}
+        style={styles.background}
+      >
         {renderCurrentPage()}
-      </View>
-      <StatusBar style="light" />
+      </LinearGradient>
+      <StatusBar style="dark" />
     </View>
   );
 }
@@ -167,6 +144,5 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    backgroundColor: '#ffffff',
   },
 });
